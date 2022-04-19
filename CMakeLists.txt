@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6.0)
-project(JamTemplate)
+project(TigerJam)
 
 set(SP2_PATH "../SeriousProton2" CACHE STRING "Path to SeriousProton2 sources")
 get_filename_component(SP2_PATH ${SP2_PATH} ABSOLUTE)

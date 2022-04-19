@@ -1,0 +1,67 @@
+[BATTLE] {
+    stretch: true
+    
+    [QUICK_TEXT] {
+        type: label
+        alignment: bottom
+        size: 100, 25
+        margin: 0, 0, 0, 100
+    }
+    
+    {
+        type: panel
+        alignment: bottom
+        layout: horizontal
+
+        size: 100, 100
+        fill_width: true
+        
+        {
+            stretch: true
+        }
+        
+        {
+            alignment: center
+            [ITEM_LIST] {
+                layout: horizontal
+            }
+        }
+
+        {
+            stretch: true
+        }
+        
+        {
+            layout: vertical
+            [STAT0] {
+                @ref: STAT_LINE
+            }
+            [STAT1] {
+                @ref: STAT_LINE
+            }
+            [STAT2] {
+                @ref: STAT_LINE
+            }
+            [STAT3] {
+                @ref: STAT_LINE
+            }
+        }
+    }
+}
+
+[@STAT_LINE] {
+    layout: horizontal
+    padding: 20, 20, 0, 0
+    [NAME] {
+        type: label
+        caption: ?????
+        size: 125, 25
+        text_size: 20
+    }
+    [HP] {
+        type: label
+        caption: ????/????
+        size: 180, 25
+        text_size: 20
+    }
+}

@@ -10,6 +10,14 @@ public:
     ~Scene();
 
     virtual void onUpdate(float delta) override;
+
+    enum class State {
+        Normal,
+        BattleStart,
+        BattleEnd,
+    } state = State::Normal;
+    float state_timer = 0.0f;
+    int steps_till_battle = 5;
 };
 
 #endif//MAIN_SCENE_H

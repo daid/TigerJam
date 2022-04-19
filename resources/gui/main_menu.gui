@@ -5,7 +5,7 @@
         alignment: top
         type: label
         theme_data: menu_menu_title
-        caption: Game Title
+        caption: The Eye
         scale_to_text: true
     }
 

@@ -30,6 +30,7 @@
 sp::P<sp::Window> window;
 sp::io::Keybinding escape_key("ESCAPE", {"Escape", "AC Back"});
 Controller controller;
+double screen_shake = 0.0;
 
 
 static void openOptionsMenu();
@@ -215,10 +216,11 @@ int main(int argc, char** argv)
     sp::io::ResourceProvider::createDefault();
 
     //Disable or enable smooth filtering by default, enabling it gives nice smooth looks, but disabling it gives a more pixel art look.
-    sp::texture_manager.setDefaultSmoothFiltering(true);
+    sp::texture_manager.setDefaultSmoothFiltering(false);
 
     //Create a window to render on, and our engine.
     window = new sp::Window();
+    window->setClearColor(sp::Color(0x282673U));
 #if !defined(DEBUG) && !defined(EMSCRIPTEN)
     window->setFullScreen(true);
 #endif
