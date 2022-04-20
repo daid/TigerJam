@@ -118,11 +118,11 @@
         }
         {
             @ref: CREDITS_TITLE
-            caption: Fonts:
+            caption: Graphics:
         }
         {
             @ref: CREDITS_LINE
-            caption: https://fonts.google.com/specimen/Roboto
+            caption: https://www.kenney.nl/assets/bit-pack
         }
 
         {
@@ -156,11 +156,11 @@
         }
         {
             @ref: CREDITS_TITLE
-            caption: json11 library: MIT License
+            caption: nlohmann json library: MIT License
         }
         {
             @ref: CREDITS_LINE
-            caption: Copyright (C) 2013 Dropbox, Inc.
+            caption: Copyright (C) 2013-2022 Niels Lohmann
         }
         {
             @ref: CREDITS_TITLE
@@ -283,18 +283,18 @@
 [@CREDITS_SECTION] {
     type: label
     scale_to_text: true
-    text.size: 25
+    text.size: 20
     alignment: center
 }
 [@CREDITS_TITLE] {
     type: label
     scale_to_text: true
-    text.size: 15
+    text.size: 13
     text.alignment: left
 }
 [@CREDITS_LINE] {
     type: label
     scale_to_text: true
-    text.size: 10
+    text.size: 8
     text.alignment: left
 }
