@@ -124,7 +124,18 @@
             @ref: CREDITS_LINE
             caption: https://www.kenney.nl/assets/bit-pack
         }
-
+        {
+            @ref: CREDITS_TITLE
+            caption: Music:
+        }
+        {
+            @ref: CREDITS_LINE
+            caption: Contains music ©2021 Joshua McLean (https://joshua-mclean.itch.io)
+        }
+        {
+            @ref: CREDITS_LINE
+            caption: Licensed under Creative Commons Attribution 4.0 International
+        }
         {
             @ref: CREDITS_SECTION
             caption: Code

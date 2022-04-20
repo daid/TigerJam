@@ -3,6 +3,7 @@
 #include "main.h"
 #include "party.h"
 #include "battlescene.h"
+#include "luafunc.h"
 
 #include <sp2/graphics/gui/loader.h>
 #include <sp2/audio/sound.h>
@@ -20,7 +21,15 @@
 sp::P<sp::Tilemap> tilemap;
 class MapPlayer;
 sp::P<MapPlayer> map_player;
+std::unordered_map<sp::string, sp::Vector2i> map_spots;
+std::unordered_map<sp::Vector2i, sp::string> map_triggers;
 std::unordered_map<int, bool> tile_type_blocked;
+sp::P<sp::gui::Widget> messagebox;
+sp::string messagebox_message;
+float messagebox_progress = 0.0f;
+std::queue<sp::string> script_queue;
+std::queue<sp::string> script_function_queue;
+
 
 class MapEntity : public sp::Node
 {
@@ -42,7 +51,7 @@ public:
         //map[pos.x][pos.y].entities.add(this);
     }
 
-    void move(sp::Vector2i _pos)
+    void move(sp::Vector2i _pos, float move_speed=6.0)
     {
         //map[pos.x][pos.y].entities.remove(this);
         sp::Vector2d start = {pos.x + 0.5, pos.y + 0.5};
@@ -50,8 +59,8 @@ public:
         sp::Vector2d target = {pos.x + 0.5, pos.y + 0.5};
         //map[pos.x][pos.y].entities.add(this);
 
-        queue([this, start, target](float time) {
-            time *= 8.0f;
+        queue([this, start, target, move_speed](float time) {
+            time *= move_speed;
             setPosition(sp::Tween<sp::Vector2d>::easeInOutCubic(time, 0.0, 1.0, start, target) +
                 sp::Vector2d(0, std::max(0.0, 0.1 * std::sin(time * sp::pi))));
             return time >= 1.0f;
@@ -71,9 +80,21 @@ public:
         }
     }
 
+    bool animationBusy() const
+    {
+        return !animations.empty();
+    }
+
     sp::Vector2i getPos()
     {
         return pos;
+    }
+
+    void setPos(sp::Vector2i p)
+    {
+        pos = p;
+        setPosition(sp::Vector2d{pos.x + 0.5, pos.y + 0.5});
+        animations.clear();
     }
 
     void queue(const std::function<bool(float)>& f)
@@ -111,6 +132,10 @@ public:
 
     bool trymove(sp::Vector2i target)
     {
+        if (map_triggers.find(target) != map_triggers.end()) {
+            script_function_queue.push(map_triggers[target]);
+        }
+
         if (target.x < 0 || target.x >= 20)
             return false;
         if (target.y < 0 || target.y >= 18)
@@ -118,13 +143,103 @@ public:
         auto it = tile_type_blocked.find(tilemap->getTileIndex(target) & 0xFFFF);
         if (it != tile_type_blocked.end())
         {
-            if (it->second)
+            if (it->second) {
                 return false;
+            }
         }
         move(target);
         return true;
     }
 };
+
+void luaLoadmap(sp::string mapname, sp::string startpoint)
+{
+    tile_type_blocked.clear();
+    map_spots.clear();
+    map_triggers.clear();
+
+    auto json = nlohmann::json::parse(sp::io::ResourceProvider::get(mapname + ".json")->readAll());
+    for(const auto& layer : json["layers"]) {
+        if (static_cast<std::string>(layer["type"]) == "tilelayer") {
+            int w = layer["width"];
+            int h = layer["height"];
+            for(int y=0; y<h; y++) {
+                for(int x=0; x<w; x++) {
+                    auto i = uint32_t(layer["data"][x + y * 20]);
+                    if (i > 0) {
+                        int flags = 0;
+                        if (i & 0x20000000)
+                            flags |= sp::Tilemap::flip_diagonal;
+                        if (i & 0x40000000)
+                            flags |= sp::Tilemap::flip_vertical;
+                        if (i & 0x80000000)
+                            flags |= sp::Tilemap::flip_horizontal;
+                        tilemap->setTile({x, h - 1 - y}, ((i & 0xFFFF) - 1) | flags);
+                    }
+                    else
+                    {
+                        tilemap->setTile({x, h - 1 - y}, -1);
+                    }
+                }
+            }
+        }
+        if (static_cast<std::string>(layer["type"]) == "objectgroup") {
+            for(const auto& obj : layer["objects"]) {
+                int x = static_cast<float>(obj["x"]) + static_cast<float>(obj["width"]) * 0.5f;
+                int y = static_cast<float>(obj["y"]) + static_cast<float>(obj["height"]) * 0.5f;
+                auto name = static_cast<std::string>(obj["name"]);
+                x = x / 16;
+                y = 17 - y / 16;
+                map_spots[name] = {x, y};
+            }
+        }
+    }
+
+    if (map_spots.find(startpoint) != map_spots.end()) {
+        map_player->setPos(map_spots[startpoint]);
+    } else {
+        LOG(Warning, "player start point: ", startpoint, " not found");
+    }
+
+    for(const auto& tile : json["tilesets"][0]["tiles"]) {
+        int id = tile["id"];
+        for(const auto& prop : tile["properties"]) {
+            std::string name = prop["name"];
+            int value = prop["value"];
+            if (name == "solid" && value) {
+                tile_type_blocked[id] = true;
+            }
+        }
+    }
+
+    script_queue.push(mapname + ".lua");
+}
+
+int luaMovePlayer(lua_State* L)
+{
+    int x = luaL_checkinteger(L, 1);
+    int y = luaL_checkinteger(L, 2);
+    float speed = luaL_optnumber(L, 3, 2.0f);
+    map_player->move(map_player->getPos() + sp::Vector2i{x, y}, speed);
+    return lua_yield(L, 0);
+}
+
+int luaMessage(lua_State* L)
+{
+    messagebox = sp::gui::Loader::load("gui/message.gui", "MESSAGE");
+    messagebox_message = luaL_checkstring(L, 1);
+    messagebox_progress = 0.0;
+    return lua_yield(L, 0);
+}
+
+void luaOnMove(sp::string target, sp::string functionname)
+{
+    if (map_spots.find(target) == map_spots.end()) {
+        LOG(Error, "Map spot not found for trigger: ", target);
+        return;
+    }
+    map_triggers[map_spots[target]] = functionname;
+}
 
 Scene::Scene()
 : sp::Scene("MAIN")
@@ -137,6 +252,12 @@ Scene::Scene()
     player_party->members[1] = new Character("character/player/rogue.lua");
     player_party->members[2] = new Character("character/player/priest.lua");
 
+    registerLuaFuncs(script_env);
+    script_env.setGlobal("loadmap", luaLoadmap);
+    script_env.setGlobal("moveplayer", luaMovePlayer);
+    script_env.setGlobal("message", luaMessage);
+    script_env.setGlobal("onmove", luaOnMove);
+
     tilemap = new sp::Tilemap(getRoot(), "tiles.png", 1.0, 1.0, 49, 22);
     tilemap->setTile({0, 0}, 1);
     tilemap->setTilemapSpacingMargin(0.01, 0.0);
@@ -146,40 +267,16 @@ Scene::Scene()
     camera->setPosition({10, 9});
     setDefaultCamera(camera);
 
-    auto json = nlohmann::json::parse(sp::io::ResourceProvider::get("map00.json")->readAll());
-    for(int y=0; y<18; y++) {
-        for(int x=0; x<20; x++) {
-            auto i = uint32_t(json["layers"][0]["data"][x + y * 20]);
-            if (i > 0) {
-                int flags = 0;
-                if (i & 0x20000000)
-                    flags |= sp::Tilemap::flip_diagonal;
-                if (i & 0x40000000)
-                    flags |= sp::Tilemap::flip_vertical;
-                if (i & 0x80000000)
-                    flags |= sp::Tilemap::flip_horizontal;
-                tilemap->setTile({x, 17 - y}, ((i & 0xFFFF) - 1) | flags);
-            }
-        }
-    }
-    tile_type_blocked.clear();
-    for(const auto& tile : json["tilesets"][0]["tiles"]) {
-        int id = tile["id"];
-        for(const auto& prop : tile["properties"]) {
-            std::string name = prop["name"];
-            int value = prop["value"];
-            if (name == "solid" && value) {
-                tile_type_blocked[id] = true;
-            }
-        }
-    }
-
     map_player = new MapPlayer(getRoot(), {8, 8});
+
+    active_sequence = script_env.loadCoroutine("start.lua").value();
 }
 
 Scene::~Scene()
 {
     sp::Scene::get("INGAME_MENU")->disable();
+    sp::Scene::get("BATTLE").destroy();
+    messagebox.destroy();
 }
 
 void Scene::onUpdate(float delta)
@@ -190,10 +287,40 @@ void Scene::onUpdate(float delta)
     switch(state)
     {
     case State::Normal:
-        if (map_player->doAction())
+        if (messagebox)
+        {
+            messagebox_progress += delta * 8.0f * (controller.primary_action.get() ? 2.0f : 1.0f);
+            messagebox->getWidgetWithID("TEXT")->setAttribute("caption", messagebox_message.substr(0, messagebox_progress));
+            messagebox->getWidgetWithID("NEXT")->setVisible(messagebox_progress > messagebox_message.length());
+            if (messagebox_progress > messagebox_message.length() && controller.primary_action.getDown()) {
+                messagebox.destroy();
+            }
+        }
+        else if (active_sequence)
+        {
+            if (!map_player->animationBusy()) {
+                if (!active_sequence->resume().value())
+                    active_sequence = nullptr;
+            }
+        }
+        else if (!script_queue.empty())
+        {
+            if (!map_player->animationBusy()) {
+                active_sequence = script_env.loadCoroutine(script_queue.front()).value();
+                script_queue.pop();
+            }
+        }
+        else if (!script_function_queue.empty())
+        {
+            if (!map_player->animationBusy()) {
+                active_sequence = script_env.callCoroutine(script_function_queue.front()).value();
+                script_function_queue.pop();
+            }
+        }
+        else if (map_player->doAction())
         {
             steps_till_battle -= 1;
-            if (steps_till_battle <= 0) {
+            if (steps_till_battle <= 0 && script_function_queue.empty() && script_queue.empty()) {
                 state = State::BattleStart;
                 state_timer = 0.0f;
                 sp::audio::Sound::play("map_attacked.wav");
@@ -206,10 +333,8 @@ void Scene::onUpdate(float delta)
         camera->setOrtographic(sp::Tween<sp::Vector2d>::easeOutQuad(state_timer, 0.0, battle_start_time, {10, 9}, {1, 1}));
         camera->setPosition(sp::Tween<sp::Vector2d>::easeOutQuad(state_timer, 0.0, battle_start_time, {10, 9}, map_player->getPosition2D()));
         if (state_timer >= battle_start_time) {
-            if (sp::Scene::get("BATTLE"))
-                sp::Scene::get("BATTLE")->enable();
-            else
-                new BattleScene();
+            sp::Scene::get("BATTLE").destroy();
+            new BattleScene();
             disable();
             state = State::BattleEnd;
             state_timer = 0.0f;

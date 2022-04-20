@@ -235,7 +235,6 @@ int main(int argc, char** argv)
 #endif
     window->addLayer(scene_layer);
 
-    new sp::audio::MusicPlayer("music");
     new IngameMenuScene();
     openMainMenu();
 

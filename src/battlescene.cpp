@@ -11,6 +11,7 @@
 #include <sp2/graphics/textureManager.h>
 #include <sp2/graphics/gui/loader.h>
 #include <sp2/graphics/gui/widget/image.h>
+#include <sp2/audio/music.h>
 #include <sp2/tween.h>
 
 
@@ -160,10 +161,13 @@ void BattleScene::onEnable()
     createBattleEntities(enemy_party, 1);
 
     gui = sp::gui::Loader::load("gui/battle.gui", "BATTLE");
+
+    sp::audio::Music::play("music/tough-consequence.ogg");
 }
 
 void BattleScene::onDisable()
 {
+    sp::audio::Music::stop();
     for(auto e : battle_entities)
         e.destroy();
     gui.destroy();

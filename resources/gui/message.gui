@@ -1,0 +1,22 @@
+[MESSAGE] {
+    type: panel
+    alignment: top
+    size: 500, 124
+    margin: 30
+    padding: 25, 12
+    
+    [TEXT] {
+        type: label
+        stretch: true
+        text_alignment: topleft
+        line_wrap: true
+    }
+    [NEXT] {
+        type: button
+        alignment: bottomright
+        size: 100, 20
+        position: -20, 20
+        caption: NEXT
+        visible: false
+    }
+}

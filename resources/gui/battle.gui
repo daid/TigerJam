@@ -33,16 +33,16 @@
         
         {
             layout: vertical
-            [STAT0] {
+            [STAT3] {
                 @ref: STAT_LINE
             }
             [STAT1] {
                 @ref: STAT_LINE
             }
-            [STAT2] {
+            [STAT0] {
                 @ref: STAT_LINE
             }
-            [STAT3] {
+            [STAT2] {
                 @ref: STAT_LINE
             }
         }

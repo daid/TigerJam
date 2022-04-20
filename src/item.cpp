@@ -1,50 +1,15 @@
 #include "item.h"
 #include "main.h"
+#include "luafunc.h"
 
 #include <sp2/random.h>
 #include <sp2/audio/sound.h>
 
-static int luaYield(lua_State* L)
-{
-    return lua_yield(L, 0);
-}
-
-static int luaInclude(lua_State* L)
-{
-    auto name = luaL_checkstring(L, 1);
-    auto stream = sp::io::ResourceProvider::get(name);
-    if (!stream)
-        return 0;
-    if (luaL_loadstring(L, stream->readAll().c_str()))
-    {
-        return lua_error(L);
-    }
-    lua_pushvalue(L, lua_upvalueindex(1));
-    //set the environment table it as 1st upvalue 
-    lua_setupvalue(L, -2, 1);
-    lua_call(L, 0, 0);
-    return 0;
-}
-
-static void luaShake(double amount)
-{
-    screen_shake = amount;
-}
-
-static void luaSfx(sp::string name)
-{
-    sp::audio::Sound::play(name);
-}
 
 Item::Item(const sp::string& script_name)
 {
     script_env.setGlobal("this", this);
-    script_env.setGlobal("yield", luaYield);
-    script_env.setGlobal("shake", luaShake);
-    script_env.setGlobal("include", luaInclude);
-    script_env.setGlobal("sfx", luaSfx);
-    script_env.setGlobal("random", sp::random);
-    script_env.setGlobal("irandom", sp::irandom);
+    registerLuaFuncs(script_env);
     script_env.load(script_name).value();
 }
 
