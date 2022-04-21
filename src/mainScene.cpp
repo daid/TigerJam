@@ -53,10 +53,16 @@ public:
         map_entities.set(pos, this);
     }
 
+    virtual ~MapEntity()
+    {
+        map_entities.clear(pos);
+    }
+
     bool move(sp::Vector2i _pos, float move_speed=6.0)
     {
-        if (map_entities.get(_pos))
+        if (map_entities.get(_pos)) {
             return false;
+        }
         map_entities.clear(pos);
         sp::Vector2d start = {pos.x + 0.5, pos.y + 0.5};
         pos = _pos;
@@ -97,7 +103,9 @@ public:
 
     void setPos(sp::Vector2i p)
     {
+        map_entities.clear(pos);
         pos = p;
+        map_entities.set(pos, this);
         setPosition(sp::Vector2d{pos.x + 0.5, pos.y + 0.5});
         animations.clear();
     }
@@ -112,6 +120,28 @@ private:
     sp::Vector2i pos;
     float animation_time = 0.0f;
     std::vector<std::function<bool(float)>> animations;
+};
+
+class NpcEntity : public MapEntity
+{
+public:
+    NpcEntity(sp::P<sp::Node> parent, sp::Vector2i pos, int tile)
+    : MapEntity(parent, pos, tile)
+    {
+    }
+
+    void moveRel(int x, int y)
+    {
+        move(getPos() + sp::Vector2i{x, y});
+    }
+
+    virtual void onRegisterScriptBindings(sp::script::BindingClass& binding_class) override
+    {
+        binding_class.bind("move", &NpcEntity::moveRel);
+        binding_class.bind("onbump", onbump);
+    }
+
+    sp::script::Callback onbump;
 };
 
 class MapPlayer : public MapEntity
@@ -140,6 +170,13 @@ public:
         if (map_triggers.find(target) != map_triggers.end()) {
             script_function_queue.push(map_triggers[target]);
         }
+        sp::P<NpcEntity> npc = map_entities.get(target);
+        if (npc) {
+            sp::P<Scene> scene = sp::Scene::get("MAIN");
+            scene->active_sequence = npc->onbump.callCoroutine().value();
+            return false;
+        }
+
 
         if (target.x < 0 || target.x >= 20)
             return false;
@@ -156,30 +193,12 @@ public:
     }
 };
 
-class NpcEntity : public MapEntity
-{
-public:
-    NpcEntity(sp::P<sp::Node> parent, sp::Vector2i pos, int tile)
-    : MapEntity(parent, pos, tile)
-    {
-    }
-
-    void moveRel(int x, int y)
-    {
-        move(getPos() + sp::Vector2i{x, y});
-    }
-
-    virtual void onRegisterScriptBindings(sp::script::BindingClass& binding_class) override
-    {
-        binding_class.bind("move", &NpcEntity::moveRel);
-        binding_class.bind("onbump", onbump);
-    }
-
-    sp::script::Callback onbump;
-};
-
 void luaLoadmap(sp::string mapname, sp::string startpoint)
 {
+    for(auto e : sp::Scene::get("MAIN")->getRoot()->getChildren()) {
+        sp::P<NpcEntity> npc = e;
+        npc.destroy();
+    }
     tile_type_blocked.clear();
     map_spots.clear();
     map_triggers.clear();
@@ -258,9 +277,22 @@ int luaMessage(lua_State* L)
     return lua_yield(L, 0);
 }
 
-sp::P<NpcEntity> luaNewNPC(int x, int y, int tile)
+sp::P<NpcEntity> luaNewNPC(sp::string spot, int tile)
 {
-    return new NpcEntity(sp::Scene::get("MAIN")->getRoot(), {x, y}, tile);
+    if (map_spots.find(spot) != map_spots.end()) {
+        return new NpcEntity(sp::Scene::get("MAIN")->getRoot(), map_spots[spot], tile);
+    }
+    return nullptr;
+}
+
+int luaBattle(lua_State* L)
+{
+    std::vector<sp::string> enemies;
+    for(int n=0; n<lua_gettop(L); n++)
+        enemies.push_back(luaL_checkstring(L, n + 1));
+    sp::P<Scene> scene = sp::Scene::get("MAIN");
+    scene->startBattle(enemies);
+    return lua_yield(L, 0);
 }
 
 void luaOnMove(sp::string target, sp::string functionname)
@@ -289,6 +321,7 @@ Scene::Scene()
     script_env.setGlobal("message", luaMessage);
     script_env.setGlobal("newnpc", luaNewNPC);
     script_env.setGlobal("onmove", luaOnMove);
+    script_env.setGlobal("battle", luaBattle);
 
     tilemap = new sp::Tilemap(getRoot(), "tiles.png", 1.0, 1.0, 49, 22);
     tilemap->setTile({0, 0}, 1);
@@ -301,6 +334,7 @@ Scene::Scene()
 
     map_player = new MapPlayer(getRoot(), {8, 8});
 
+    script_env.setGlobal("randomencounter", nullptr);
     active_sequence = script_env.loadCoroutine("start.lua").value();
 }
 
@@ -309,6 +343,12 @@ Scene::~Scene()
     sp::Scene::get("INGAME_MENU")->disable();
     sp::Scene::get("BATTLE").destroy();
     messagebox.destroy();
+}
+
+void Scene::onFixedUpdate()
+{
+    if (messagebox)
+        messagebox->getWidgetWithID("NEXT")->setVisible(messagebox_progress > messagebox_message.length());
 }
 
 void Scene::onUpdate(float delta)
@@ -323,9 +363,12 @@ void Scene::onUpdate(float delta)
         {
             messagebox_progress += delta * 8.0f * (controller.primary_action.get() ? 2.0f : 1.0f);
             messagebox->getWidgetWithID("TEXT")->setAttribute("caption", messagebox_message.substr(0, messagebox_progress));
-            messagebox->getWidgetWithID("NEXT")->setVisible(messagebox_progress > messagebox_message.length());
-            if (messagebox_progress > messagebox_message.length() && controller.primary_action.getDown()) {
-                messagebox.destroy();
+            if (controller.primary_action.getDown()) {
+                if (messagebox_progress > messagebox_message.length()) {
+                    messagebox.destroy();
+                } else {
+                    messagebox_progress += 5.0f;
+                }
             }
         }
         else if (active_sequence)
@@ -353,9 +396,7 @@ void Scene::onUpdate(float delta)
         {
             steps_till_battle -= 1;
             if (steps_till_battle <= 0 && script_function_queue.empty() && script_queue.empty()) {
-                state = State::BattleStart;
-                state_timer = 0.0f;
-                sp::audio::Sound::play("map_attacked.wav");
+                active_sequence = script_env.callCoroutine("randomencounter").value();
                 steps_till_battle = sp::irandom(5, 15);
             }
         }
@@ -382,4 +423,19 @@ void Scene::onUpdate(float delta)
         }
         break;
     }
+}
+
+void Scene::startBattle(const std::vector<sp::string>& enemies)
+{
+    if (enemies.size() < 1)
+        return;
+    enemy_party.destroy();
+    enemy_party = new Party();
+    for(unsigned int n=0; n<enemies.size() && n<enemy_party->members.size(); n++) {
+        enemy_party->members[n] = new Character("character/" + enemies[n] + ".lua");
+    }
+
+    state = State::BattleStart;
+    state_timer = 0.0f;
+    sp::audio::Sound::play("map_attacked.wav");
 }

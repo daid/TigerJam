@@ -11,7 +11,9 @@ public:
     Scene();
     ~Scene();
 
+    virtual void onFixedUpdate() override;
     virtual void onUpdate(float delta) override;
+    void startBattle(const std::vector<sp::string>& enemies);
 
     enum class State {
         Normal,

@@ -38,7 +38,7 @@ Character::Character(const sp::string& script_name)
 {
     sp::script::Environment env;
     env.setGlobal("this", this);
-    env.load(script_name);
+    env.load(script_name).value();
     hp = active_stats.max_hp;
 }
 

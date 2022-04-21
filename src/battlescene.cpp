@@ -153,11 +153,6 @@ BattleScene::~BattleScene()
 void BattleScene::onEnable()
 {
     createBattleEntities(player_party, -1);
-    enemy_party.destroy();
-    enemy_party = new Party();
-    enemy_party->members[0] = new Character("character/monster/bat.lua");
-    enemy_party->members[1] = new Character("character/monster/scorpion.lua");
-
     createBattleEntities(enemy_party, 1);
 
     gui = sp::gui::Loader::load("gui/battle.gui", "BATTLE");

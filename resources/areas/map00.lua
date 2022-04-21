@@ -7,3 +7,7 @@ onmove("house2", "house2")
 function house2()
     loadmap("areas/house2", "entrance")
 end
+
+function randomencounter()
+    battle("monster/bat", "monster/scorpion")
+end
