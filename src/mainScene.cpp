@@ -29,6 +29,8 @@ sp::string messagebox_message;
 float messagebox_progress = 0.0f;
 std::queue<sp::string> script_queue;
 std::queue<sp::string> script_function_queue;
+class MapEntity;
+sp::InfiniGrid<sp::P<MapEntity>> map_entities{nullptr};
 
 
 class MapEntity : public sp::Node
@@ -48,16 +50,18 @@ public:
         render_data.type = sp::RenderData::Type::Normal;
         render_data.texture = sp::texture_manager.get("tiles.png");
         setPosition({pos.x + 0.5, pos.y + 0.5});
-        //map[pos.x][pos.y].entities.add(this);
+        map_entities.set(pos, this);
     }
 
-    void move(sp::Vector2i _pos, float move_speed=6.0)
+    bool move(sp::Vector2i _pos, float move_speed=6.0)
     {
-        //map[pos.x][pos.y].entities.remove(this);
+        if (map_entities.get(_pos))
+            return false;
+        map_entities.clear(pos);
         sp::Vector2d start = {pos.x + 0.5, pos.y + 0.5};
         pos = _pos;
         sp::Vector2d target = {pos.x + 0.5, pos.y + 0.5};
-        //map[pos.x][pos.y].entities.add(this);
+        map_entities.set(pos, this);
 
         queue([this, start, target, move_speed](float time) {
             time *= move_speed;
@@ -65,6 +69,7 @@ public:
                 sp::Vector2d(0, std::max(0.0, 0.1 * std::sin(time * sp::pi))));
             return time >= 1.0f;
         });
+        return true;
     }
 
     virtual void onUpdate(float delta) override
@@ -147,9 +152,30 @@ public:
                 return false;
             }
         }
-        move(target);
-        return true;
+        return move(target);
     }
+};
+
+class NpcEntity : public MapEntity
+{
+public:
+    NpcEntity(sp::P<sp::Node> parent, sp::Vector2i pos, int tile)
+    : MapEntity(parent, pos, tile)
+    {
+    }
+
+    void moveRel(int x, int y)
+    {
+        move(getPos() + sp::Vector2i{x, y});
+    }
+
+    virtual void onRegisterScriptBindings(sp::script::BindingClass& binding_class) override
+    {
+        binding_class.bind("move", &NpcEntity::moveRel);
+        binding_class.bind("onbump", onbump);
+    }
+
+    sp::script::Callback onbump;
 };
 
 void luaLoadmap(sp::string mapname, sp::string startpoint)
@@ -232,6 +258,11 @@ int luaMessage(lua_State* L)
     return lua_yield(L, 0);
 }
 
+sp::P<NpcEntity> luaNewNPC(int x, int y, int tile)
+{
+    return new NpcEntity(sp::Scene::get("MAIN")->getRoot(), {x, y}, tile);
+}
+
 void luaOnMove(sp::string target, sp::string functionname)
 {
     if (map_spots.find(target) == map_spots.end()) {
@@ -256,6 +287,7 @@ Scene::Scene()
     script_env.setGlobal("loadmap", luaLoadmap);
     script_env.setGlobal("moveplayer", luaMovePlayer);
     script_env.setGlobal("message", luaMessage);
+    script_env.setGlobal("newnpc", luaNewNPC);
     script_env.setGlobal("onmove", luaOnMove);
 
     tilemap = new sp::Tilemap(getRoot(), "tiles.png", 1.0, 1.0, 49, 22);
