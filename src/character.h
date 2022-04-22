@@ -1,13 +1,14 @@
 #pragma once
 
 #include <sp2/pointerList.h>
+#include <sp2/script/coroutine.h>
 #include "item.h"
 
 
 class BattleEntity;
 class Stats {
 public:
-    int max_hp = 10;
+    int max_hp = 0;
     int max_mp = 0;
 
     int strength = 0;
@@ -17,6 +18,53 @@ public:
 
     int defense = 0;
     int evasion = 0;
+
+    Stats& operator+=(const Stats& other) {
+        max_hp += other.max_hp;
+        max_mp += other.max_mp;
+        strength += other.strength;
+        agility += other.agility;
+        intelligence += other.intelligence;
+        stamina += other.stamina;
+        defense += other.defense;
+        evasion += other.evasion;
+        return *this;
+    }
+    Stats operator*(const Stats& other) {
+        return {
+            max_hp * other.max_hp,
+            max_mp * other.max_mp,
+
+            strength * other.strength,
+            agility * other.agility,
+            intelligence * other.intelligence,
+            stamina * other.stamina,
+
+            defense * other.defense,
+            evasion * other.evasion,
+        };
+    }
+    Stats operator/(int other) {
+        return {
+            max_hp / other,
+            max_mp / other,
+
+            strength / other,
+            agility / other,
+            intelligence / other,
+            stamina / other,
+
+            defense / other,
+            evasion / other,
+        };
+    }
+};
+class Buff
+{
+public:
+    Stats stats_add;
+    Stats stats_mul;
+    sp::script::CoroutinePtr func;
 };
 class Character : public sp::script::BindingObject
 {
@@ -51,6 +99,10 @@ public:
     void setEvasion(int value) { base_stats.evasion = value; recalculate(); }
     void addItem(sp::string item);
 
+    int addBuff(lua_State* L);
+    void tickBuffs();
+    void clearBuffs() { buffs.clear(); recalculate(); }
+
     float speed();
     void recalculate();
 
@@ -61,6 +113,7 @@ public:
     int mp;
     Stats base_stats;
     Stats active_stats;
+    std::unordered_map<sp::string, Buff> buffs;
 
     sp::PList<Item> items;
     sp::P<Item> current_item;

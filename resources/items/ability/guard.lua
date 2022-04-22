@@ -9,9 +9,12 @@ function use(source, target)
         yield()
     end
     
-    target.textRain("+DEF")
-    --TODO: Actual buff
-    --buff("GUARD", function() for n=0,10 do yield() end)
+    --TODO: Actuall stat increase
+    if target.addBuff("GUARD", {"defense", 10}, function() for n=0,10 do yield() end) then
+        target.textRain("+DEF")
+    else
+        source.textRain("No effect")
+    end
     for n=0, 25 do yield() end
 
     for n=0,10 do

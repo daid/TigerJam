@@ -212,6 +212,8 @@ void BattleScene::onFixedUpdate()
     if (current_action) {
         auto result = current_action->resume().value();
         if (!result) {
+            current_entity->character->tickBuffs();
+
             current_action = nullptr;
             for(auto be : battle_entities) {
                 if (be->idle_state == BattleEntity::IdleState::Busy)
@@ -222,6 +224,12 @@ void BattleScene::onFixedUpdate()
 
             if (!player_party->alive() || !enemy_party->alive())
             {
+                for(auto member : player_party->members)
+                    if (member)
+                        member->clearBuffs();
+                for(auto member : enemy_party->members)
+                    if (member)
+                        member->clearBuffs();
                 sp::Scene::get("MAIN")->enable();
                 disable();
             }
