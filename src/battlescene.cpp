@@ -233,7 +233,7 @@ void BattleScene::onFixedUpdate()
             findNextTurn();
             gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", "");
             break;
-        case State::SelectAction:
+        case State::SelectAction:{
             if (controller.right.getDown()) {
                 current_entity->character->nextItem();
                 buildItemList();
@@ -252,8 +252,11 @@ void BattleScene::onFixedUpdate()
                 for(auto e : gui->getWidgetWithID("ITEM_LIST")->getChildren())
                     e.destroy();
             }
-            gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", current_entity->character->name + ": " + current_entity->character->current_item->name);
-            break;
+            auto name = current_entity->character->name;
+            if (current_entity->character->current_item->type == Item::Type::Magic)
+                name += " " + sp::string(current_entity->character->mp) + "/" + sp::string(current_entity->character->active_stats.max_mp) + "MP";
+            gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", name + ": " + current_entity->character->current_item->name);
+            }break;
         case State::SelectTarget:
             if (controller.left.getDown()) selectTarget({-1, 0}, current_entity->character->current_item->target);
             if (controller.right.getDown()) selectTarget({1, 0}, current_entity->character->current_item->target);

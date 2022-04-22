@@ -12,6 +12,7 @@
 #include <sp2/scene/camera.h>
 #include <sp2/graphics/textureManager.h>
 #include <sp2/graphics/meshdata.h>
+#include <sp2/graphics/gui/widget/image.h>
 #include <sp2/io/resourceProvider.h>
 #include <sp2/scene/tilemap.h>
 #include <sp2/tween.h>
@@ -401,6 +402,20 @@ void Scene::onUpdate(float delta)
         else if (controller.primary_action.getDown())
         {
             menu = sp::gui::Loader::load("gui/menu.gui", "MAIN");
+            for(auto n=0U; n<player_party->members.size(); n++) {
+                auto info = menu->getWidgetWithID("INFO" + sp::string(n));
+                auto member = player_party->members[n];
+                if (!member) {
+                    info->hide();
+                } else {
+                    info->getWidgetWithID("NAME")->setAttribute("caption", member->name);
+                    sp::P<sp::gui::Image> icon = info->getWidgetWithID("ICON");
+                    icon->setAttribute("texture", "tiles.png");
+                    icon->setUV(tileUV(member->icon));
+                    info->getWidgetWithID("HP")->setAttribute("caption", "HP:" + sp::string(member->hp) + "/" + sp::string(member->active_stats.max_hp));
+                    info->getWidgetWithID("MP")->setAttribute("caption", "MP:" + sp::string(member->mp) + "/" + sp::string(member->active_stats.max_mp));
+                }
+            }
             menu->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant v) {
                 menu.destroy();
                 state = State::Delay;

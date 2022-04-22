@@ -6,3 +6,4 @@ this.agility = 8
 this.stamina = 15
 
 this.addItem("items/sword.lua")
+this.addItem("items/ability/guard.lua")

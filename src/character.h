@@ -8,12 +8,14 @@ class BattleEntity;
 class Stats {
 public:
     int max_hp = 10;
+    int max_mp = 0;
 
     int strength = 0;
     int agility = 0;
     int intelligence = 0;
     int stamina = 0;
 
+    int defense = 0;
     int evasion = 0;
 };
 class Character : public sp::script::BindingObject
@@ -35,12 +37,16 @@ public:
     void setHP(int value) { hp = std::clamp(value, 0, active_stats.max_hp); }
     int getMaxHP() const { return active_stats.max_hp; }
     void setMaxHP(int value) { base_stats.max_hp = value; recalculate(); }
+    int getMP() const { return hp; }
+    void setMP(int value) { mp = std::clamp(value, 0, active_stats.max_mp); }
+    int getMaxMP() const { return active_stats.max_mp; }
+    void setMaxMP(int value) { base_stats.max_mp = value; recalculate(); }
     int getStrength() const { return active_stats.strength; }
     void setStrength(int value) { base_stats.strength = value; recalculate(); }
     int getAgility() const { return active_stats.agility; }
     void setAgility(int value) { base_stats.agility = value; recalculate(); }
-    int getDefence() const { return 0; }
-    void setDefence(int value) { }
+    int getDefence() const { return active_stats.defense; }
+    void setDefence(int value) { base_stats.defense = value; recalculate(); }
     int getEvasion() const { return active_stats.evasion; }
     void setEvasion(int value) { base_stats.evasion = value; recalculate(); }
     void addItem(sp::string item);
@@ -52,6 +58,7 @@ public:
     int icon;
 
     int hp;
+    int mp;
     Stats base_stats;
     Stats active_stats;
 

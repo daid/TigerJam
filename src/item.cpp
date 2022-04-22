@@ -17,7 +17,25 @@ void Item::onRegisterScriptBindings(sp::script::BindingClass& script_binding_cla
 {
     script_binding_class.bindProperty("name", name);
     script_binding_class.bindProperty("icon", icon);
+    script_binding_class.bindProperty("type", &Item::getType, &Item::setType);
     script_binding_class.bindProperty("target", &Item::getTarget, &Item::setTarget);
+}
+
+sp::string Item::getType() const
+{
+    switch(type) {
+    case Type::Item: return "item";
+    case Type::Ability: return "ability";
+    case Type::Magic: return "magic";
+    }
+    return "";
+}
+
+void Item::setType(sp::string value)
+{
+    if (value == "item") type = Type::Item;
+    if (value == "ability") type = Type::Ability;
+    if (value == "magic") type = Type::Magic;
 }
 
 sp::string Item::getTarget() const

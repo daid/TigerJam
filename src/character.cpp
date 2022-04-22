@@ -40,6 +40,7 @@ Character::Character(const sp::string& script_name)
     env.setGlobal("this", this);
     env.load(script_name).value();
     hp = active_stats.max_hp;
+    mp = active_stats.max_mp;
 }
 
 Character::~Character()
@@ -85,7 +86,9 @@ void Character::onRegisterScriptBindings(sp::script::BindingClass& script_bindin
     script_binding_class.bindProperty("name", name);
     script_binding_class.bindProperty("icon", icon);
     script_binding_class.bindProperty("hp", &Character::getHP, &Character::setHP);
+    script_binding_class.bindProperty("mp", &Character::getMP, &Character::setMP);
     script_binding_class.bindProperty("max_hp", &Character::getMaxHP, &Character::setMaxHP);
+    script_binding_class.bindProperty("max_mp", &Character::getMaxHP, &Character::setMaxMP);
     script_binding_class.bindProperty("strength", &Character::getStrength, &Character::setStrength);
     script_binding_class.bindProperty("agility", &Character::getAgility, &Character::setAgility);
 
@@ -130,4 +133,5 @@ void Character::recalculate()
     active_stats = base_stats;
     active_stats.evasion += active_stats.agility / 2;
     hp = std::clamp(hp, 0, active_stats.max_hp);
+    mp = std::clamp(mp, 0, active_stats.max_mp);
 }

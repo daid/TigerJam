@@ -11,12 +11,19 @@ public:
 
     virtual void onRegisterScriptBindings(sp::script::BindingClass& script_binding_class) override;
 
+    sp::string getType() const;
+    void setType(sp::string);
     sp::string getTarget() const;
     void setTarget(sp::string);
 
     sp::string name;
     int icon;
     sp::script::Environment script_env;
+    enum class Type {
+        Item, //Can be traded to other character
+        Ability, //Cannot be traded
+        Magic,   //Cannot be traded, shows MP
+    } type = Type::Item;
     enum class Target {
         Any,
         Enemy,

@@ -1,7 +1,6 @@
-this.name = "Cure (3MP)"
-this.icon = 532
-this.target = "ally"
-this.type = "magic"
+this.name = "Guard"
+this.icon = 3 * 49 + 39
+this.target = "self"
 
 function use(source, target)
     for n=0,10 do
@@ -10,14 +9,9 @@ function use(source, target)
         yield()
     end
     
-    if source.mp >= 3 then
-        local heal_amount = 100
-        target.textRain("+" .. heal_amount)
-        target.hp = target.hp + heal_amount
-        source.mp = source.mp - 3
-    else
-        source.textRain("NO MP")
-    end
+    target.textRain("+DEF")
+    --TODO: Actual buff
+    --buff("GUARD", function() for n=0,10 do yield() end)
     for n=0, 25 do yield() end
 
     for n=0,10 do
