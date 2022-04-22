@@ -85,7 +85,7 @@ public:
     void setHP(int value) { hp = std::clamp(value, 0, active_stats.max_hp); }
     int getMaxHP() const { return active_stats.max_hp; }
     void setMaxHP(int value) { base_stats.max_hp = value; recalculate(); }
-    int getMP() const { return hp; }
+    int getMP() const { return mp; }
     void setMP(int value) { mp = std::clamp(value, 0, active_stats.max_mp); }
     int getMaxMP() const { return active_stats.max_mp; }
     void setMaxMP(int value) { base_stats.max_mp = value; recalculate(); }
