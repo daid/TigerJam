@@ -6,7 +6,7 @@ this.type = "magic"
 function use(source, target)
     for n=0,10 do
         local delta = source.getFrontPosition() - source.getPosition()
-        source.setPosition(source.getPosition() + delta * n / 20 + Vector2(0, math.sin(n / 20 * math.pi) * 0.3))
+        source.setPosition(source.getPosition() + delta * n / 10 + Vector2(0, math.sin(n / 10 * math.pi) * 0.3))
         yield()
     end
     
@@ -22,7 +22,7 @@ function use(source, target)
 
     for n=0,10 do
         local delta = source.getPosition() - source.getFrontPosition()
-        source.setPosition(source.getFrontPosition() + delta * n / 20 + Vector2(0, math.sin(n / 20 * math.pi) * 0.3))
+        source.setPosition(source.getFrontPosition() + delta * n / 10 + Vector2(0, math.sin(n / 10 * math.pi) * 0.3))
         yield()
     end
 end

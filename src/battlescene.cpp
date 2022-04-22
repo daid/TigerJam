@@ -254,7 +254,7 @@ void BattleScene::onFixedUpdate()
             }
             auto name = current_entity->character->name;
             if (current_entity->character->current_item->type == Item::Type::Magic)
-                name += " " + sp::string(current_entity->character->mp) + "/" + sp::string(current_entity->character->active_stats.max_mp) + "MP";
+                name += " MP:" + sp::string(current_entity->character->mp) + "/" + sp::string(current_entity->character->active_stats.max_mp);
             gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", name + ": " + current_entity->character->current_item->name);
             }break;
         case State::SelectTarget:
