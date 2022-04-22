@@ -222,16 +222,8 @@ void BattleScene::onFixedUpdate()
                     be.destroy();
             }
 
-            if (!player_party->alive() || !enemy_party->alive())
-            {
-                for(auto member : player_party->members)
-                    if (member)
-                        member->clearBuffs();
-                for(auto member : enemy_party->members)
-                    if (member)
-                        member->clearBuffs();
-                sp::Scene::get("MAIN")->enable();
-                disable();
+            if (!player_party->alive() || !enemy_party->alive()) {
+                state = State::Victory;
             }
         }
     } else {
@@ -285,6 +277,19 @@ void BattleScene::onFixedUpdate()
                 gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", "");
             } else if (current_target) {
                 gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", current_target->character->name);
+            }
+            break;
+        case State::Victory:
+            gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", "Victory!");
+            if (controller.primary_action.getDown()) {
+                for(auto member : player_party->members)
+                    if (member)
+                        member->clearBuffs();
+                for(auto member : enemy_party->members)
+                    if (member)
+                        member->clearBuffs();
+                sp::Scene::get("MAIN")->enable();
+                disable();
             }
             break;
         }

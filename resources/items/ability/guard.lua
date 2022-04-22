@@ -9,7 +9,6 @@ function use(source, target)
         yield()
     end
     
-    --TODO: Actuall stat increase
     if target.addBuff("GUARD", {"defense", 10}, function() for n=0,10 do yield() end) then
         target.textRain("+DEF")
     else

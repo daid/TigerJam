@@ -59,6 +59,7 @@ private:
         Wait,
         SelectAction,
         SelectTarget,
+        Victory,
     } state = State::Wait;
 
     sp::P<BattleEntity> current_entity;
