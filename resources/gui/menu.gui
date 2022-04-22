@@ -89,19 +89,19 @@
         [LVL] {
             type: label
             caption: Lv:
-            size: 260, 20
+            size: 240, 20
             text_alignment: left
         }
         [HP] {
             type: label
             caption: HP: ????/????
-            size: 260, 20
+            size: 240, 20
             text_alignment: left
         }
         [MP] {
             type: label
             caption: MP: ???/???
-            size: 260, 20
+            size: 240, 20
             text_alignment: left
         }
     }

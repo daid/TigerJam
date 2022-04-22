@@ -36,6 +36,7 @@ public:
 
 Character::Character(const sp::string& script_name)
 {
+    base_stats.threat = 100;
     sp::script::Environment env;
     env.setGlobal("this", this);
     env.load(script_name).value();
@@ -95,6 +96,8 @@ void Character::onRegisterScriptBindings(sp::script::BindingClass& script_bindin
 
     script_binding_class.bindProperty("defence", &Character::getDefence, &Character::setDefence);
     script_binding_class.bindProperty("evasion", &Character::getEvasion, &Character::setEvasion);
+    
+    script_binding_class.bindProperty("threat", &Character::getThreat, &Character::setThreat);
 }
 
 void Character::setPos(sp::Vector2d position)
@@ -198,6 +201,8 @@ int Character::addBuff(lua_State* L)
 
     parse("defense", buff.stats_add.defense, buff.stats_mul.defense);
     parse("evasion", buff.stats_add.evasion, buff.stats_mul.evasion);
+
+    parse("threat", buff.stats_add.threat, buff.stats_mul.threat);
 
     lua_pushboolean(L, true);
     return 1;

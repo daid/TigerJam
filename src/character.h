@@ -19,6 +19,8 @@ public:
     int defense = 0;
     int evasion = 0;
 
+    int threat = 0;
+
     Stats& operator+=(const Stats& other) {
         max_hp += other.max_hp;
         max_mp += other.max_mp;
@@ -28,6 +30,7 @@ public:
         stamina += other.stamina;
         defense += other.defense;
         evasion += other.evasion;
+        threat += other.threat;
         return *this;
     }
     Stats operator*(const Stats& other) {
@@ -42,6 +45,8 @@ public:
 
             defense * other.defense,
             evasion * other.evasion,
+
+            threat * other.threat,
         };
     }
     Stats operator/(int other) {
@@ -56,6 +61,8 @@ public:
 
             defense / other,
             evasion / other,
+
+            threat / other,
         };
     }
 };
@@ -97,6 +104,8 @@ public:
     void setDefence(int value) { base_stats.defense = value; recalculate(); }
     int getEvasion() const { return active_stats.evasion; }
     void setEvasion(int value) { base_stats.evasion = value; recalculate(); }
+    int getThreat() const { return active_stats.threat; }
+    void setThreat(int value) { base_stats.threat = value; recalculate(); }
     void addItem(sp::string item);
 
     int addBuff(lua_State* L);

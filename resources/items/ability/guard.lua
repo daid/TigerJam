@@ -1,4 +1,5 @@
 this.name = "Guard"
+this.description = "Increases defence and the chance of being attacked"
 this.icon = 3 * 49 + 39
 this.target = "self"
 
@@ -9,7 +10,7 @@ function use(source, target)
         yield()
     end
     
-    if target.addBuff("GUARD", {"defense", 10}, function() for n=0,10 do yield() end end) then
+    if target.addBuff("GUARD", {defense=10, threat=100}, function() for n=0,15 do yield() end target.textRain("-DEF") end) then
         target.textRain("+DEF")
     else
         source.textRain("No effect")

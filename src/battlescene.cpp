@@ -386,10 +386,17 @@ sp::P<BattleEntity> BattleScene::randomTarget(sp::P<Party> party)
 {
     if (!party->alive())
         return nullptr;
-    while(true) {
-        int idx = sp::irandom(0, party->members.size() - 1);
-        if (party->members[idx] && party->members[idx]->hp > 0 && party->members[idx]->battle_entity)
-            return party->members[idx]->battle_entity;
+    int total_threat = 0;
+    for(auto member : party->members)
+        if (member && member->battle_entity)
+            total_threat += member->getThreat();
+    int target_threat = sp::irandom(0, total_threat - 1);
+    for(auto member : party->members) {
+        if (member && member->battle_entity) {
+            target_threat -= member->getThreat();
+            if (target_threat < 0)
+                return member->battle_entity;
+        }
     }
     return nullptr;
 }
