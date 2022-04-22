@@ -143,7 +143,7 @@ int Character::addBuff(lua_State* L)
         return luaL_error(L, "3th argument of addBuff not a function");
     }
     lua_State* L2 = lua_newthread(L);
-    lua_pushvalue(L, 2);
+    lua_pushvalue(L, 3);
     lua_xmove(L, L2, 1);
 
     int result = lua_resume(L2, nullptr, 0);

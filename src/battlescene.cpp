@@ -265,6 +265,8 @@ void BattleScene::onFixedUpdate()
             if (controller.secondary_action.getDown()) {
                 state = State::SelectAction;
                 buildItemList();
+                source_cursor = new BattleCursor(current_entity);
+                target_cursor.destroy();
             } else if (controller.primary_action.getDown() && current_target) {
                 current_action = current_entity->character->current_item->script_env.callCoroutine("use", current_entity->character, current_target->character).value();
                 current_entity->idle_state = BattleEntity::IdleState::Busy;
