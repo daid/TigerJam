@@ -93,6 +93,8 @@ void Character::onRegisterScriptBindings(sp::script::BindingClass& script_bindin
     script_binding_class.bindProperty("max_mp", &Character::getMaxHP, &Character::setMaxMP);
     script_binding_class.bindProperty("strength", &Character::getStrength, &Character::setStrength);
     script_binding_class.bindProperty("agility", &Character::getAgility, &Character::setAgility);
+    script_binding_class.bindProperty("intelligence", &Character::getIntelligence, &Character::setIntelligence);
+    script_binding_class.bindProperty("stamina", &Character::getStamina, &Character::setStamina);
 
     script_binding_class.bindProperty("defence", &Character::getDefence, &Character::setDefence);
     script_binding_class.bindProperty("evasion", &Character::getEvasion, &Character::setEvasion);

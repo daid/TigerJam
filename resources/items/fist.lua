@@ -2,6 +2,7 @@
 this.name = "Fist"
 this.icon = 41
 this.target = "enemy"
+this.type = "ability"
 
 weapon_strength = 0
 weapon_hit = 0

@@ -100,6 +100,10 @@ public:
     void setStrength(int value) { base_stats.strength = value; recalculate(); }
     int getAgility() const { return active_stats.agility; }
     void setAgility(int value) { base_stats.agility = value; recalculate(); }
+    int getIntelligence() const { return active_stats.intelligence; }
+    void setIntelligence(int value) { base_stats.intelligence = value; recalculate(); }
+    int getStamina() const { return active_stats.stamina; }
+    void setStamina(int value) { base_stats.stamina = value; recalculate(); }
     int getDefence() const { return active_stats.defense; }
     void setDefence(int value) { base_stats.defense = value; recalculate(); }
     int getEvasion() const { return active_stats.evasion; }

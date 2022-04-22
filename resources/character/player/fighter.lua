@@ -1,6 +1,6 @@
 this.name = "FIGHT"
 this.icon = 26
-this.max_hp = 35
+this.max_hp = 235
 this.strength = 10
 this.agility = 8
 this.stamina = 15

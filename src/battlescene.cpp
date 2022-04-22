@@ -157,7 +157,7 @@ void BattleScene::onEnable()
 
     gui = sp::gui::Loader::load("gui/battle.gui", "BATTLE");
 
-    sp::audio::Music::play("music/tough-consequence.ogg");
+    sp::audio::Music::play("music/tough-consequence.ogg", true);
 }
 
 void BattleScene::onDisable()
@@ -222,8 +222,11 @@ void BattleScene::onFixedUpdate()
                     be.destroy();
             }
 
-            if (!player_party->alive() || !enemy_party->alive()) {
+            if (!enemy_party->alive()) {
                 state = State::Victory;
+            }
+            if (!player_party->alive()) {
+                state = State::Defeat;
             }
         }
     } else {
@@ -294,6 +297,9 @@ void BattleScene::onFixedUpdate()
                 disable();
             }
             break;
+        case State::Defeat:
+            gui->getWidgetWithID("QUICK_TEXT")->setAttribute("caption", "Defeat!");
+            break;
         }
     }
 }
@@ -316,8 +322,13 @@ void BattleScene::findNextTurn()
     if (current_entity->party == enemy_party)
     {
         // Pick an target for the AI attack (could be done better)
-        // TODO: Pick other attacks then the first.
+        int item_count = 0;
+        for(auto item : current_entity->character->items)
+            item_count ++;
+        int item_idx = sp::irandom(0, item_count - 1);
         auto it = current_entity->character->items.begin();
+        while(item_idx--)
+            ++it;
         auto target_be = randomTarget(player_party);
         if ((*it)->target == Item::Target::Ally)
             target_be = randomTarget(enemy_party);

@@ -2,6 +2,7 @@ this.name = "Guard"
 this.description = "Increases defence and the chance of being attacked"
 this.icon = 3 * 49 + 39
 this.target = "self"
+this.type = "ability"
 
 function use(source, target)
     for n=0,10 do

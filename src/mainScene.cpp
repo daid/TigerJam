@@ -137,12 +137,24 @@ public:
         move(getPos() + sp::Vector2i{x, y});
     }
 
+    void destroy()
+    {
+        destroy_me = true;
+    }
+
+    virtual void onFixedUpdate() override
+    {
+        if (destroy_me) delete this;
+    }
+
     virtual void onRegisterScriptBindings(sp::script::BindingClass& binding_class) override
     {
         binding_class.bind("move", &NpcEntity::moveRel);
+        binding_class.bind("destroy", &NpcEntity::destroy);
         binding_class.bind("onbump", onbump);
     }
 
+    bool destroy_me = false;
     sp::script::Callback onbump;
 };
 
@@ -266,7 +278,7 @@ int luaMovePlayer(lua_State* L)
 {
     int x = luaL_checkinteger(L, 1);
     int y = luaL_checkinteger(L, 2);
-    float speed = luaL_optnumber(L, 3, 2.0f);
+    float speed = luaL_optnumber(L, 3, 4.0f);
     map_player->move(map_player->getPos() + sp::Vector2i{x, y}, speed);
     return lua_yield(L, 0);
 }
@@ -364,13 +376,13 @@ void Scene::onUpdate(float delta)
     case State::Normal:
         if (messagebox)
         {
-            messagebox_progress += delta * 8.0f * (controller.primary_action.get() ? 2.0f : 1.0f);
+            messagebox_progress += delta * 8.0f;
             messagebox->getWidgetWithID("TEXT")->setAttribute("caption", messagebox_message.substr(0, messagebox_progress));
             if (controller.primary_action.getDown()) {
                 if (messagebox_progress > messagebox_message.length()) {
                     messagebox.destroy();
                 } else {
-                    messagebox_progress += 5.0f;
+                    messagebox_progress = messagebox_message.length();
                 }
             }
         }
