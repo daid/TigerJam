@@ -1,0 +1,108 @@
+[MAIN] {
+    size: 640, 480
+    alignment: center
+
+    {
+        type: panel
+        layout: vertical
+        alignment: right
+        
+        [ITEMS] {
+            @ref: MAIN_BUTTON
+            caption: Items
+
+            {
+                type: keynavigator
+                margin: -5
+                stretch: true
+                select: PRIMARY
+                visible: true
+            }
+        }
+
+        [STATS] {
+            @ref: MAIN_BUTTON
+            caption: Stats
+        }
+
+        [ABILITIES] {
+            @ref: MAIN_BUTTON
+            caption: Abilities
+        }
+
+        [EXIT] {
+            @ref: MAIN_BUTTON
+            caption: Exit
+            keybinding: CANCEL
+        }
+    }
+    
+    {
+        alignment: left
+        layout: vertical
+        
+        [INFO3] {
+            @ref: QUICK_INFO
+        }
+        [INFO1] {
+            @ref: QUICK_INFO
+        }
+        [INFO0] {
+            @ref: QUICK_INFO
+        }
+        [INFO2] {
+            @ref: QUICK_INFO
+        }
+    }
+}
+
+[@MAIN_BUTTON] {
+    type: button
+    size: 200, 50
+    margin: 10
+    alignment: center
+}
+
+[@QUICK_INFO] {
+    type: panel
+    size: 380, 80
+    margin: 10
+    padding: 5
+    
+    [NAME] {
+        type: label
+        caption: NAME
+        size: 150, 20
+        text_alignment: left
+        
+    }
+    [ICON] {
+        type: image
+        size: 50, 50
+        texture: gui/theme/pixel.png
+        alignment: bottomleft
+    }
+    {
+        layout: vertical
+        alignment: topright
+        
+        [LVL] {
+            type: label
+            caption: Lv:
+            size: 260, 20
+            text_alignment: left
+        }
+        [HP] {
+            type: label
+            caption: HP: ????/????
+            size: 260, 20
+            text_alignment: left
+        }
+        [MP] {
+            type: label
+            caption: MP: ???/???
+            size: 260, 20
+            text_alignment: left
+        }
+    }
+}

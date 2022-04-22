@@ -4,7 +4,7 @@
     size: 20
     [label] {
         [menu_menu_title] {
-            size: 50
+            size: 70
         }
     }
     [button.forground] {

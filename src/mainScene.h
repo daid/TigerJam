@@ -19,6 +19,7 @@ public:
         Normal,
         BattleStart,
         BattleEnd,
+        Delay,
     } state = State::Normal;
     float state_timer = 0.0f;
     int steps_till_battle = 5;

@@ -32,6 +32,7 @@ std::queue<sp::string> script_function_queue;
 class MapEntity;
 sp::InfiniGrid<sp::P<MapEntity>> map_entities{nullptr};
 
+sp::P<sp::gui::Widget> menu;
 
 class MapEntity : public sp::Node
 {
@@ -343,6 +344,7 @@ Scene::~Scene()
     sp::Scene::get("INGAME_MENU")->disable();
     sp::Scene::get("BATTLE").destroy();
     messagebox.destroy();
+    menu.destroy();
 }
 
 void Scene::onFixedUpdate()
@@ -392,6 +394,18 @@ void Scene::onUpdate(float delta)
                 script_function_queue.pop();
             }
         }
+        else if (menu)
+        {
+            //Do nothing, menu is in control
+        }
+        else if (controller.primary_action.getDown())
+        {
+            menu = sp::gui::Loader::load("gui/menu.gui", "MAIN");
+            menu->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant v) {
+                menu.destroy();
+                state = State::Delay;
+            });
+        }
         else if (map_player->doAction())
         {
             steps_till_battle -= 1;
@@ -421,6 +435,11 @@ void Scene::onUpdate(float delta)
             state = State::Normal;
             state_timer = 0.0f;
         }
+        break;
+    case State::Delay:
+        //Sometimes we just need to skip a cycle (usually for double input prevention)
+        state = State::Normal;
+        state_timer = 0.0f;
         break;
     }
 }
