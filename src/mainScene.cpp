@@ -489,11 +489,194 @@ void Scene::openSubmenu()
             info->getWidgetWithID("MP")->setAttribute("caption", "MP:" + sp::string(member->mp) + "/" + sp::string(member->active_stats.max_mp));
         }
     }
+    menu->getWidgetWithID("ITEMS")->setEventCallback([this](sp::Variant) {
+        menu.destroy();
+        openItemsOrAbilitiesMenu(true);
+    });
     menu->getWidgetWithID("STATS")->setEventCallback([this](sp::Variant) {
         menu.destroy();
         openStatsMenu();
     });
+    menu->getWidgetWithID("ABILITIES")->setEventCallback([this](sp::Variant) {
+        menu.destroy();
+        openItemsOrAbilitiesMenu(false);
+    });
     menu->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant) {
+        menu.destroy();
+        state = State::Delay;
+    });
+}
+
+class ItemCursor : public sp::gui::Widget
+{
+public:
+    ItemCursor(sp::P<sp::gui::Widget> parent, bool _is_items)
+    : sp::gui::Widget(parent), is_items(_is_items)
+    {
+        layout.alignment = sp::Alignment::Center;
+
+        updateDesc();
+    }
+
+    virtual void onFixedUpdate() override {
+        if (reparent_fix) return;
+        if (controller.left.getDown()) move(sp::Vector2i(0, -1));
+        if (controller.right.getDown()) move(sp::Vector2i(0, 1));
+        if (controller.up.getDown()) move(sp::Vector2i(1, 0));
+        if (controller.down.getDown()) move(sp::Vector2i(-1, 0));
+    }
+
+    virtual void onUpdate(float delta) override {
+        sp::gui::Widget::onUpdate(delta);
+        reparent_fix = false;
+    }
+
+    sp::Vector2i getPos()
+    {
+        //Figure out which row/column we are
+        sp::P<sp::gui::Widget> w = getParent();
+        int item_idx = w->getID().back() - '0';
+        w = w->getParent();
+        int member_idx = w->getID().back() - '0';
+        return {member_idx, item_idx};
+    }
+
+    void move(sp::Vector2i offset) {
+        sp::P<sp::gui::Widget> w = getParent()->getParent()->getParent();
+        w = w->getWidgetAt<sp::gui::Image>(getGlobalPosition2D() + sp::Vector2d(offset.y * 50.0, offset.x * 75.0));
+        if (w && w->getID().startswith("ITEM")) {
+            setParent(w);
+            updateDesc();
+            reparent_fix = true;
+        }
+    }
+
+    sp::P<Item> getItem() {
+        auto [member_idx, item_idx] = getPos();
+        auto member = player_party->members[member_idx];
+        auto it = member->items.begin();
+
+        while(it != member->items.end()) {
+            if (is_items) {
+                while(it != member->items.end() && (*it)->type != Item::Type::Item)
+                    ++it;
+            } else {
+                while(it != member->items.end() && (*it)->type == Item::Type::Item)
+                    ++it;
+            }
+            if (it == member->items.end())
+                break;
+            if (item_idx == 0)
+                return *it;
+            item_idx--;
+            ++it;
+        }
+        return nullptr;
+    }
+
+    void updateDesc()
+    {
+        sp::P<sp::gui::Widget> w = getParent()->getParent()->getParent();
+        auto item = getItem();
+        w->getWidgetWithID("DESC")->setAttribute("caption", item ? item->description : "");
+    }
+
+    virtual void updateRenderData() override {
+        auto tile_idx = 979;
+        auto tile_sx = 49;
+        auto tile_sy = 22;
+        auto u = 1.0f / float(tile_sx);
+        auto v = 1.0f / float(tile_sy);
+
+        sp::Vector2d uv0 = {(tile_idx % tile_sx) * u, (tile_idx / tile_sx) * v};
+        sp::Vector2d uv1 = uv0 + sp::Vector2d{u * 0.5, v * 0.5};
+
+        sp::MeshData::Vertices vertices;
+        sp::MeshData::Indices indices{
+            0,1,2,2,1,3,
+            4,5,6,6,5,7,
+            8,9,10,10,9,11,
+            12,13,14,14,13,15,
+        };
+        vertices.reserve(4);
+
+        float a = 37.5f;
+        float b = 12.5f;
+        
+        vertices.emplace_back(sp::Vector3f(-a, -a, 0.0f), sp::Vector2f(uv0.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f(-b, -a, 0.0f), sp::Vector2f(uv1.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f(-a, -b, 0.0f), sp::Vector2f(uv0.x, uv1.y));
+        vertices.emplace_back(sp::Vector3f(-b, -b, 0.0f), sp::Vector2f(uv1.x, uv1.y));
+
+        vertices.emplace_back(sp::Vector3f( b, -a, 0.0f), sp::Vector2f(uv1.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f( a, -a, 0.0f), sp::Vector2f(uv0.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f( b, -b, 0.0f), sp::Vector2f(uv1.x, uv1.y));
+        vertices.emplace_back(sp::Vector3f( a, -b, 0.0f), sp::Vector2f(uv0.x, uv1.y));
+
+        vertices.emplace_back(sp::Vector3f(-b,  a, 0.0f), sp::Vector2f(uv1.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f(-a,  a, 0.0f), sp::Vector2f(uv0.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f(-b,  b, 0.0f), sp::Vector2f(uv1.x, uv1.y));
+        vertices.emplace_back(sp::Vector3f(-a,  b, 0.0f), sp::Vector2f(uv0.x, uv1.y));
+
+        vertices.emplace_back(sp::Vector3f( a,  a, 0.0f), sp::Vector2f(uv0.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f( b,  a, 0.0f), sp::Vector2f(uv1.x, uv0.y));
+        vertices.emplace_back(sp::Vector3f( a,  b, 0.0f), sp::Vector2f(uv0.x, uv1.y));
+        vertices.emplace_back(sp::Vector3f( b,  b, 0.0f), sp::Vector2f(uv1.x, uv1.y));
+
+        render_data.mesh = sp::MeshData::create(std::move(vertices), std::move(indices));
+        render_data.shader = sp::Shader::get("internal:basic.shader");
+        render_data.type = sp::RenderData::Type::Normal;
+        render_data.texture = sp::texture_manager.get("tiles.png");
+    }
+
+    bool is_items;
+    bool reparent_fix = false;
+};
+
+void Scene::openItemsOrAbilitiesMenu(bool is_items)
+{
+    menu_opening = true;
+    menu = sp::gui::Loader::load("gui/items_menu.gui", "ITEMS");
+
+    sp::P<sp::gui::Widget> first_row;
+    for(auto n=0U; n<player_party->members.size(); n++)
+    {
+        auto member = player_party->members[n];
+        auto row = menu->getWidgetWithID("CHAR" + sp::string(n));
+        if (!member) {
+            row->hide();
+        } else {
+            if (!first_row) first_row = row;
+            sp::P<sp::gui::Image> char_icon = row->getWidgetWithID("CHAR_ICON");
+            char_icon->setAttribute("texture", "tiles.png");
+            char_icon->setUV(tileUV(member->icon));
+
+            auto it = member->items.begin();
+            for(int idx=0; idx<6; idx++) {
+                sp::P<sp::gui::Image> icon = row->getWidgetWithID("ITEM" + sp::string(idx));
+                icon->setAttribute("texture", "tiles.png");
+
+                if (is_items) {
+                    while(it != member->items.end() && (*it)->type != Item::Type::Item)
+                        ++it;
+                } else {
+                    while(it != member->items.end() && (*it)->type == Item::Type::Item)
+                        ++it;
+                }
+                if (it == member->items.end()) {
+                    icon->setUV(tileUV(0));
+                } else {
+                    icon->setUV(tileUV((*it)->icon));
+                    ++it;
+                }
+            }
+        }
+    }
+
+    new ItemCursor(first_row->getWidgetWithID("ITEM0"), is_items);
+
+    menu->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant) {
+        if (menu_opening) return;
         menu.destroy();
         state = State::Delay;
     });
@@ -518,8 +701,8 @@ void Scene::openStatsMenu()
     });
     menu->getWidgetWithID("EXIT2")->setEventCallback([this](sp::Variant) {
         if (menu_opening) return;
-        menu.destroy();
-        state = State::Delay;
+        //menu.destroy();
+        //state = State::Delay;
     });
 }
 

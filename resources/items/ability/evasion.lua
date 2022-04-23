@@ -1,6 +1,6 @@
 this.name = "Evasion"
 this.description = "Increases evasion for a number of turns"
-this.icon = 3 * 49 + 39
+this.icon = 717
 this.target = "self"
 this.type = "ability"
 

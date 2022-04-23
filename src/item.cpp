@@ -16,6 +16,7 @@ Item::Item(const sp::string& script_name)
 void Item::onRegisterScriptBindings(sp::script::BindingClass& script_binding_class)
 {
     script_binding_class.bindProperty("name", name);
+    script_binding_class.bindProperty("description", description);
     script_binding_class.bindProperty("icon", icon);
     script_binding_class.bindProperty("type", &Item::getType, &Item::setType);
     script_binding_class.bindProperty("target", &Item::getTarget, &Item::setTarget);

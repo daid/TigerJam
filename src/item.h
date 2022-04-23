@@ -17,6 +17,7 @@ public:
     void setTarget(sp::string);
 
     sp::string name;
+    sp::string description;
     int icon;
     sp::script::Environment script_env;
     enum class Type {
