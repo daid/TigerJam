@@ -24,6 +24,7 @@ if not killed_tiger then
     tiger.onbump(function()
         message("There is the tiger!")
         battle("monster/tiger", "monster/baby_tiger", "monster/baby_tiger")
+        yield()
         tiger.destroy()
         message("You killed the tiger\n\nAnd it's babies.")
         message("You cut out the eye of the tiger.")

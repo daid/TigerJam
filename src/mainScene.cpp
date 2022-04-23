@@ -306,7 +306,7 @@ int luaBattle(lua_State* L)
         enemies.push_back(luaL_checkstring(L, n + 1));
     sp::P<Scene> scene = sp::Scene::get("MAIN");
     scene->startBattle(enemies);
-    return lua_yield(L, 0);
+    return 0;//return lua_yield(L, 0); <- this corrupts heap, not sure why...
 }
 
 void luaOnMove(sp::string target, sp::string functionname)
