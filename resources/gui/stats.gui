@@ -1,0 +1,106 @@
+[STATS] {
+    alignment: center
+    layout: vertical
+
+    {
+        type: panel
+        layout: horizontal
+        padding: 10
+        margin: 20, 20, 20, 0
+        
+        [ICON] {
+            type: image
+            size: 50, 50
+            texture: gui/theme/pixel.png
+            alignment: leftbottom
+            margin: 0, 10, 0, 0
+        }
+        [NAME] {
+            @ref: STAT
+            caption: NAME
+            size: 340, 20
+            alignment: leftbottom
+        }
+    }
+
+    {
+        type: panel
+        layout: vertical
+        padding: 10
+        margin: 20
+        
+        [HP] {
+            @ref: STAT
+            caption: HP: ????/????
+        }
+        [MP] {
+            @ref: STAT
+            caption: MP: ???/???
+            margin: 0, 0, 0, 10
+        }
+
+        [STR] {
+            @ref: STAT
+            caption: Strength:     ???
+        }
+        [AGI] {
+            @ref: STAT
+            caption: Agility:      ???
+        }
+        [INT] {
+            @ref: STAT
+            caption: Intelligence: ???
+        }
+        [STA] {
+            @ref: STAT
+            caption: Stamina:      ???
+            margin: 0, 0, 0, 10
+        }
+
+        [DEF] {
+            @ref: STAT
+            caption: Defense:      ???
+        }
+        [EVA] {
+            @ref: STAT
+            caption: Evasion:      ???
+        }
+    }
+
+    [PREV] {
+        type: button
+        size: 0, 0
+        margin: 0
+
+        keybinding: LEFT
+    }
+    
+    [NEXT] {
+        type: button
+        size: 0, 0
+        margin: 0
+
+        keybinding: RIGHT
+    }
+
+    [EXIT] {
+        type: button
+        size: 0, 0
+        margin: 0
+
+        keybinding: CANCEL
+    }
+    [EXIT2] {
+        type: button
+        size: 0, 0
+        margin: 0
+
+        keybinding: PRIMARY
+    }
+}
+
+[@STAT] {
+    type: label
+    size: 400, 20
+    text_alignment: left
+}

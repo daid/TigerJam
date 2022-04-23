@@ -1,4 +1,5 @@
 this.name = "Dagger"
+this.description = "Basic dagger, +7 attack"
 this.icon = 330
 this.target = "enemy"
 

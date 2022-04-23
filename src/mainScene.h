@@ -14,6 +14,11 @@ public:
     virtual void onFixedUpdate() override;
     virtual void onUpdate(float delta) override;
     void startBattle(const std::vector<sp::string>& enemies);
+    void openSubmenu();
+    void openStatsMenu();
+    void updateStatsMenu(int member);
+    int stats_menu_member_index = 0;
+    bool menu_opening = false;
 
     enum class State {
         Normal,

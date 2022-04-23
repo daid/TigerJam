@@ -1,4 +1,5 @@
 this.name = "Cure (3MP)"
+this.description = "Cure spell, heals HP"
 this.icon = 532
 this.target = "ally"
 this.type = "magic"
