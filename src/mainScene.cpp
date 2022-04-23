@@ -443,6 +443,10 @@ void Scene::onUpdate(float delta)
         }
         break;
     case State::BattleStart:
+        if (map_player->animationBusy())
+            break;
+        if (state_timer == 0.0f && delta > 0.0f)
+            sp::audio::Sound::play("map_attacked.wav");
         state_timer += delta;
         camera->setOrtographic(sp::Tween<sp::Vector2d>::easeOutQuad(state_timer, 0.0, battle_start_time, {10, 9}, {1, 1}));
         camera->setPosition(sp::Tween<sp::Vector2d>::easeOutQuad(state_timer, 0.0, battle_start_time, {10, 9}, map_player->getPosition2D()));
@@ -483,5 +487,4 @@ void Scene::startBattle(const std::vector<sp::string>& enemies)
 
     state = State::BattleStart;
     state_timer = 0.0f;
-    sp::audio::Sound::play("map_attacked.wav");
 }

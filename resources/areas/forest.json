@@ -153,6 +153,24 @@
                         }]
                 }, 
                 {
+                 "id":101,
+                 "properties":[
+                        {
+                         "name":"solid",
+                         "type":"int",
+                         "value":1
+                        }]
+                }, 
+                {
+                 "id":102,
+                 "properties":[
+                        {
+                         "name":"solid",
+                         "type":"int",
+                         "value":1
+                        }]
+                }, 
+                {
                  "id":253,
                  "properties":[
                         {
