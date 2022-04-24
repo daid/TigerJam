@@ -1,0 +1,77 @@
+[ITEMS] {
+    alignment: center
+    layout: vertical
+
+    {
+        type: panel
+        margin: 20, 20, 20, 0
+        padding: 10
+        [DESC] {
+            type: label
+            caption: Description
+            text_alignment: left
+            line_wrap: true
+            size: 420, 40
+        }
+    }
+
+    [CHAR3] {
+        @ref: CHAR
+    }
+    [CHAR1] {
+        @ref: CHAR
+    }
+    [CHAR0] {
+        @ref: CHAR
+    }
+    [CHAR2] {
+        @ref: CHAR
+    }
+
+
+    [EXIT] {
+        type: button
+        size: 0, 0
+        margin: 0
+
+        keybinding: CANCEL
+    }
+}
+
+[@CHAR] {
+    type: panel
+    layout: horizontal
+    padding: 10
+    margin: 20, 20, 20, 0
+    
+    [CHAR_ICON] {
+        @ref: ICON
+    }
+
+    [ITEM0] {
+        @ref: ICON
+    }
+    [ITEM1] {
+        @ref: ICON
+    }
+    [ITEM2] {
+        @ref: ICON
+    }
+    [ITEM3] {
+        @ref: ICON
+    }
+    [ITEM4] {
+        @ref: ICON
+    }
+    [ITEM5] {
+        @ref: ICON
+    }
+}
+
+[@ICON] {
+    type: image
+    size: 50, 50
+    texture: gui/theme/pixel.png
+    alignment: leftbottom
+    margin: 0, 10, 0, 0
+}
