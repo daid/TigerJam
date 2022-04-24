@@ -578,6 +578,7 @@ void Scene::startBattle(const std::vector<sp::string>& enemies)
 
 void Scene::openSubmenu()
 {
+    if (luaMemberCount() < 1) return;
     menu = sp::gui::Loader::load("gui/menu.gui", "MAIN");
     for(auto n=0U; n<player_party->members.size(); n++) {
         auto info = menu->getWidgetWithID("INFO" + sp::string(n));
