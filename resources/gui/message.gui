@@ -20,3 +20,55 @@
         visible: false
     }
 }
+
+[MENU] {
+    size: 640, 480
+    alignment: center
+
+    {
+        type: panel
+        layout: vertical
+        alignment: bottomright
+        margin: 20
+        
+        [OPT0] {
+            @ref: MAIN_BUTTON
+            caption: OPT0
+
+            {
+                type: keynavigator
+                margin: -5
+                stretch: true
+                select: PRIMARY
+                visible: true
+            }
+        }
+
+        [OPT1] {
+            @ref: MAIN_BUTTON
+            caption: OPT1
+        }
+
+        [OPT2] {
+            @ref: MAIN_BUTTON
+            caption: OPT2
+        }
+
+        [OPT3] {
+            @ref: MAIN_BUTTON
+            caption: OPT3
+        }
+
+        [OPT4] {
+            @ref: MAIN_BUTTON
+            caption: OPT4
+        }
+    }
+}
+
+[@MAIN_BUTTON] {
+    type: button
+    size: 200, 50
+    margin: 10
+    alignment: center
+}

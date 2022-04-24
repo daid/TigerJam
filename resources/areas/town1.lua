@@ -18,6 +18,11 @@ function entercastle()
     loadmap("areas/castle", "entrance")
 end
 
+onmove("guild", "enterguild")
+function enterguild()
+    loadmap("areas/guild", "entrance")
+end
+
 shop = newnpc("shop", 74)
 shop.onbump(function()
     message("Come back later when I'm implemented...")

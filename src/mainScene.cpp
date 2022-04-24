@@ -26,6 +26,7 @@ std::unordered_map<sp::string, sp::Vector2i> map_spots;
 std::unordered_map<sp::Vector2i, sp::string> map_triggers;
 std::unordered_map<int, bool> tile_type_blocked;
 sp::P<sp::gui::Widget> messagebox;
+sp::P<sp::gui::Widget> script_menu;
 sp::string messagebox_message;
 float messagebox_progress = 0.0f;
 std::queue<sp::string> script_queue;
@@ -291,6 +292,34 @@ int luaMessage(lua_State* L)
     return lua_yield(L, 0);
 }
 
+int luaMenu(lua_State* L)
+{
+    messagebox = sp::gui::Loader::load("gui/message.gui", "MESSAGE");
+    messagebox->getWidgetWithID("TEXT")->setAttribute("caption", luaL_checkstring(L, 1));
+    script_menu = sp::gui::Loader::load("gui/message.gui", "MENU");
+    for(int n=0; n<5; n++) {
+        auto opt = script_menu->getWidgetWithID("OPT" + sp::string(n));
+        if (n < lua_gettop(L) - 1) {
+            sp::string text = luaL_checkstring(L, n + 2);
+            opt->setAttribute("caption", text);
+            opt->setEventCallback([text](sp::Variant) {
+                sp::P<Scene> scene = sp::Scene::get("MAIN");
+
+                scene->state = Scene::State::Delay;
+                messagebox.destroy();
+                script_menu.destroy();
+
+                if (scene && scene->active_sequence)
+                    if (!scene->active_sequence->resume(text).value())
+                        scene->active_sequence = nullptr;
+            });
+        } else {
+            opt->hide();
+        }
+    }
+    return lua_yield(L, 0);
+}
+
 sp::P<NpcEntity> luaNewNPC(sp::string spot, int tile)
 {
     if (map_spots.find(spot) != map_spots.end()) {
@@ -318,6 +347,53 @@ void luaOnMove(sp::string target, sp::string functionname)
     map_triggers[map_spots[target]] = functionname;
 }
 
+void luaRecoverHPMP()
+{
+    for(auto member : player_party->members) {
+        if (member && member->hp > 0) {
+            member->hp = member->active_stats.max_hp;
+            member->mp = member->active_stats.max_mp;
+        }
+    }
+}
+
+int luaMemberCount()
+{
+    int count = 0;
+    for(auto member : player_party->members) {
+        if (member && member->hp > 0) {
+            count += 1;
+        }
+    }
+    return count;
+}
+
+sp::string luaMemberName(int index)
+{
+    if (index < 0 || index > int(player_party->members.size()))
+        return "";
+    if (!player_party->members[index])
+        return "";
+    return player_party->members[index]->name;
+}
+
+void luaMemberDestroy(int index)
+{
+    if (index < 0 || index > int(player_party->members.size()))
+        return;
+    player_party->members[index].destroy();
+}
+
+void luaMemberAdd(sp::string name)
+{
+    for(auto& member : player_party->members) {
+        if (!member) {
+            member = new Character(name);
+            return;
+        }
+    }
+}
+
 Scene::Scene()
 : sp::Scene("MAIN")
 {
@@ -325,17 +401,20 @@ Scene::Scene()
 
     player_party.destroy();
     player_party = new Party();
-    player_party->members[0] = new Character("character/player/fighter.lua");
-    player_party->members[1] = new Character("character/player/rogue.lua");
-    player_party->members[2] = new Character("character/player/priest.lua");
 
     registerLuaFuncs(script_env);
     script_env.setGlobal("loadmap", luaLoadmap);
     script_env.setGlobal("moveplayer", luaMovePlayer);
     script_env.setGlobal("message", luaMessage);
+    script_env.setGlobal("menu", luaMenu);
     script_env.setGlobal("newnpc", luaNewNPC);
     script_env.setGlobal("onmove", luaOnMove);
     script_env.setGlobal("battle", luaBattle);
+    script_env.setGlobal("recoverHPMP", luaRecoverHPMP);
+    script_env.setGlobal("partyMemberCount", luaMemberCount);
+    script_env.setGlobal("partyMemberName", luaMemberName);
+    script_env.setGlobal("partyMemberAdd", luaMemberAdd);
+    script_env.setGlobal("partyMemberDestroy", luaMemberDestroy);
 
     tilemap = new sp::Tilemap(getRoot(), "tiles.png", 1.0, 1.0, 49, 22);
     tilemap->setTile({0, 0}, 1);
@@ -357,25 +436,32 @@ Scene::~Scene()
     sp::Scene::get("INGAME_MENU")->disable();
     sp::Scene::get("BATTLE").destroy();
     messagebox.destroy();
+    script_menu.destroy();
     menu.destroy();
 }
 
 void Scene::onFixedUpdate()
 {
-    if (messagebox)
+    if (messagebox && !script_menu)
         messagebox->getWidgetWithID("NEXT")->setVisible(messagebox_progress > messagebox_message.length());
 }
 
 void Scene::onUpdate(float delta)
 {
+    if (delta == 0.0f) return;
     auto constexpr battle_start_time = 0.7f;
     auto constexpr battle_end_time = 0.5f;
     auto camera = getCamera();
     switch(state)
     {
     case State::Normal:
-        if (messagebox)
-        {
+        if (script_menu) {
+            if (controller.secondary_action.getDown()) {
+                //This will return nil to the menu() option
+                messagebox.destroy();
+                script_menu.destroy();
+            }
+        } else if (messagebox) {
             messagebox_progress += delta * 8.0f;
             messagebox->getWidgetWithID("TEXT")->setAttribute("caption", messagebox_message.substr(0, messagebox_progress));
             if (controller.primary_action.getDown()) {

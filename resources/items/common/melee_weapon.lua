@@ -14,7 +14,7 @@ function use(source, target)
         target.textRain(dmg)
         sfx("basic_hit.wav")
         target.hp = target.hp - dmg
-        onhit(target)
+        onhit(source, target, dmg)
         if dmg > 0 then
             shake(0.1);
         end
@@ -24,6 +24,6 @@ function use(source, target)
     doMove(source, target.getFrontPosition(), source.getPosition(), 20)
 end
 
-function onhit(target)
+function onhit(source, target, dmg)
 
 end

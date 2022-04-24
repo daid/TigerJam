@@ -1,4 +1,5 @@
 this.name = "Poison Sting"
+this.description = "Sting an enemy in the attempt to poison it."
 this.icon = 566
 this.target = "enemy"
 this.type = "ability"
@@ -8,8 +9,8 @@ weapon_hit = 0
 
 include("items/common/melee_weapon.lua")
 
-function onhit(target)
-    if target.addBuff("POISON", {}, function()
+function onhit(source, target, dmg)
+    if target.addBuff("POISON", {defense=-2}, function()
         for n=0,5 do
             yield()
 

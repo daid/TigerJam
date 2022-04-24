@@ -33,7 +33,9 @@ void IngameMenuScene::onUpdate(float delta)
         }
         else
         {
-            exit = true;
+            for(auto node : getRootWidget()->getChildren())
+                node.destroy();
+            sp::Engine::getInstance()->setGameSpeed(1.0);
         }
     }
 

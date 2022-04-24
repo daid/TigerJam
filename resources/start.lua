@@ -1,4 +1,4 @@
-loadmap("areas/town1", "start")
+loadmap("areas/guild", "start")
 --loadmap("areas/forest", "tiger2")
 
 --for n=0, 4 do moveplayer(1, 0) end

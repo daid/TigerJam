@@ -1,5 +1,5 @@
 this.name = "ROGUE"
-this.icon = 77
+this.icon = 128
 this.max_hp = 152
 this.strength = 5
 this.agility = 15
