@@ -1,5 +1,6 @@
 #include "character.h"
 #include "battlescene.h"
+#include "party.h"
 #include <sp2/graphics/fontManager.h>
 
 class TextRain : public sp::Node
@@ -84,6 +85,7 @@ void Character::onRegisterScriptBindings(sp::script::BindingClass& script_bindin
     script_binding_class.bind("getFrontPosition", &Character::getFrontPos);
     script_binding_class.bind("textRain", &Character::createTextRain);
     script_binding_class.bind("addItem", &Character::addItem);
+    script_binding_class.bind("newMember", &Character::newMember);
     script_binding_class.bind("addBuff", &Character::addBuff);
     script_binding_class.bindProperty("name", name);
     script_binding_class.bindProperty("icon", icon);
@@ -132,6 +134,12 @@ float Character::speed()
 void Character::addItem(sp::string item)
 {
     items.add(new Item(item));
+}
+
+bool Character::newMember(sp::string script_name)
+{
+    sp::P<BattleScene> bs = sp::Scene::get("BATTLE");
+    return bs->newMember(battle_entity->party, script_name);
 }
 
 int Character::addBuff(lua_State* L)

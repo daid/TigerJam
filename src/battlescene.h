@@ -43,8 +43,11 @@ public:
     virtual void onDisable() override;
     virtual void onUpdate(float delta) override;
     virtual void onFixedUpdate() override;
+
+    bool newMember(sp::P<Party> party, sp::string script_name);
 private:
     void createBattleEntities(sp::P<Party> party, double side);
+    void createBattleEntity(sp::P<Party> party, int index, double side);
     void findNextTurn();
     void buildItemList();
     void selectTarget(sp::Vector2d offset, Item::Target target_type);

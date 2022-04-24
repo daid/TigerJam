@@ -111,6 +111,8 @@ public:
     int getThreat() const { return active_stats.threat; }
     void setThreat(int value) { base_stats.threat = value; recalculate(); }
     void addItem(sp::string item);
+    bool newMember(sp::string script_name);
+    void message(sp::string message);
 
     int addBuff(lua_State* L);
     void tickBuffs();

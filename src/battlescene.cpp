@@ -172,16 +172,22 @@ void BattleScene::createBattleEntities(sp::P<Party> party, double side)
 {
     for(auto n=0U; n<party->members.size(); n++) {
         if (party->members[n] && party->members[n]->hp > 0) {
-            auto be = new BattleEntity(getRoot(), {nominal_position_offset[n].x * side, nominal_position_offset[n].y}, party->members[n]->icon);
-            be->turn_delay = sp::random(0, 1);
-            be->party = party;
-            be->member_index = n;
-            be->character = party->members[n];
-            party->members[n]->battle_entity = be;
-            battle_entities.add(be);
+            createBattleEntity(party, n, side);
         }
     }
 }
+
+void BattleScene::createBattleEntity(sp::P<Party> party, int index, double side)
+{
+    auto be = new BattleEntity(getRoot(), {nominal_position_offset[index].x * side, nominal_position_offset[index].y}, party->members[index]->icon);
+    be->turn_delay = sp::random(0, 1);
+    be->party = party;
+    be->member_index = index;
+    be->character = party->members[index];
+    party->members[index]->battle_entity = be;
+    battle_entities.add(be);
+}
+
 
 void BattleScene::onUpdate(float delta)
 {
@@ -413,4 +419,18 @@ sp::P<BattleEntity> BattleScene::randomTarget(sp::P<Party> party)
         }
     }
     return nullptr;
+}
+
+bool BattleScene::newMember(sp::P<Party> party, sp::string script_name)
+{
+    for(auto n=0U; n<party->members.size(); n++) {
+        if (party->members[n] && !party->members[n]->battle_entity)
+            party->members[n].destroy();
+        if (!party->members[n]) {
+            party->members[n] = new Character(script_name);
+            createBattleEntity(party, n, 1);
+            return true;
+        }
+    }
+    return false;
 }

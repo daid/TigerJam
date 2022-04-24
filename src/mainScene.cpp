@@ -363,6 +363,15 @@ void luaOnMove(sp::string target, sp::string functionname)
     map_triggers[map_spots[target]] = functionname;
 }
 
+void luaSetTile(sp::string target, int tile)
+{
+    if (map_spots.find(target) == map_spots.end()) {
+        LOG(Error, "Map spot not found for settile: ", target);
+        return;
+    }
+    tilemap->setTile(map_spots[target], tile);
+}
+
 void luaRecoverHPMP()
 {
     for(auto member : player_party->members) {
@@ -427,6 +436,7 @@ Scene::Scene()
     script_env.setGlobal("menu", luaMenu);
     script_env.setGlobal("newnpc", luaNewNPC);
     script_env.setGlobal("onmove", luaOnMove);
+    script_env.setGlobal("settile", luaSetTile);
     script_env.setGlobal("battle", luaBattle);
     script_env.setGlobal("recoverHPMP", luaRecoverHPMP);
     script_env.setGlobal("partyMemberCount", luaMemberCount);
@@ -525,7 +535,7 @@ void Scene::onUpdate(float delta)
             steps_till_battle -= 1;
             if (steps_till_battle <= 0 && script_function_queue.empty() && script_queue.empty()) {
                 active_sequence = script_env.callCoroutine("randomencounter").value();
-                steps_till_battle = sp::irandom(5, 15);
+                steps_till_battle = sp::irandom(5, 10);
             }
         }
         break;

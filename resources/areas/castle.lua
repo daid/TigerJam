@@ -3,6 +3,11 @@ function entrance()
     loadmap("areas/town1", "castle")
 end
 
+onmove("jail", "enterjail")
+function enterjail()
+    loadmap("areas/jail", "entrance")
+end
+
 king = newnpc("king", 175)
 king.onbump(function()
     visited_king = true
@@ -31,8 +36,8 @@ king.onbump(function()
         guard1.move(1, 0)
         guard2.move(-1, 0)
         for n=0,10 do yield() end
-        message("End of DEMO")
-        loadmap("areas/castle", "jail")
+        message("Off to jail with you!")
+        loadmap("areas/jail", "cell")
     end
 end)
 
