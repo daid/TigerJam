@@ -42,6 +42,16 @@ public:
     MapEntity(sp::P<sp::Node> parent, sp::Vector2i _pos, int tile_idx)
     : sp::Node(parent), pos(_pos)
     {
+        setTile(tile_idx);
+        render_data.shader = sp::Shader::get("internal:basic.shader");
+        render_data.type = sp::RenderData::Type::Normal;
+        render_data.texture = sp::texture_manager.get("tiles.png");
+        setPosition({pos.x + 0.5, pos.y + 0.5});
+        map_entities.set(pos, this);
+    }
+
+    void setTile(int tile_idx)
+    {
         auto tile_sx = 49;
         auto tile_sy = 22;
         auto u = 1.0f / float(tile_sx);
@@ -49,11 +59,6 @@ public:
         render_data.mesh = sp::MeshData::createQuad({1, 1},
             {(tile_idx % tile_sx) * u, (tile_idx / tile_sx) * v},
             {(tile_idx % tile_sx) * u + u, (tile_idx / tile_sx) * v + v});
-        render_data.shader = sp::Shader::get("internal:basic.shader");
-        render_data.type = sp::RenderData::Type::Normal;
-        render_data.texture = sp::texture_manager.get("tiles.png");
-        setPosition({pos.x + 0.5, pos.y + 0.5});
-        map_entities.set(pos, this);
     }
 
     virtual ~MapEntity()
@@ -163,8 +168,19 @@ class MapPlayer : public MapEntity
 {
 public:
     MapPlayer(sp::P<sp::Node> parent, sp::Vector2i pos)
-    : MapEntity(parent, pos, 26)
+    : MapEntity(parent, pos, 25)
     {
+    }
+
+    void updateIcon()
+    {
+        for(auto member : player_party->members) {
+            if (member) {
+                setTile(member->icon);
+                return;
+            }
+        }
+        setTile(25);
     }
 
     bool doAction()
@@ -382,6 +398,7 @@ void luaMemberDestroy(int index)
     if (index < 0 || index > int(player_party->members.size()))
         return;
     player_party->members[index].destroy();
+    map_player->updateIcon();
 }
 
 void luaMemberAdd(sp::string name)
@@ -389,6 +406,7 @@ void luaMemberAdd(sp::string name)
     for(auto& member : player_party->members) {
         if (!member) {
             member = new Character(name);
+            map_player->updateIcon();
             return;
         }
     }
