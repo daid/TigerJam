@@ -524,6 +524,14 @@ public:
         if (controller.right.getDown()) move(sp::Vector2i(0, 1));
         if (controller.up.getDown()) move(sp::Vector2i(1, 0));
         if (controller.down.getDown()) move(sp::Vector2i(-1, 0));
+        if (controller.primary_action.getDown() && is_items) {
+            if (move_item) {
+                move_item = nullptr;
+            } else {
+                move_item = getItem();
+            }
+            markRenderDataOutdated();
+        }
     }
 
     virtual void onUpdate(float delta) override {
@@ -543,12 +551,69 @@ public:
 
     void move(sp::Vector2i offset) {
         sp::P<sp::gui::Widget> w = getParent()->getParent()->getParent();
-        w = w->getWidgetAt<sp::gui::Image>(getGlobalPosition2D() + sp::Vector2d(offset.y * 50.0, offset.x * 75.0));
+        sp::P<sp::gui::Widget> old_parent = getParent();
+        w = w->getWidgetAt<sp::gui::Image>(getGlobalPosition2D() + sp::Vector2d(offset.y * 50.0, offset.x * 100.0));
         if (w && w->getID().startswith("ITEM")) {
+            if (move_item) {
+                auto p = getPos();
+                player_party->members[p.x]->items.remove(move_item);
+            }
             setParent(w);
+            if (move_item) {
+                auto p = getPos();
+                player_party->members[p.x]->items.add(move_item);
+                w = updateIcons();
+                if (w) {
+                    setParent(w);
+                } else {
+                    // Could not move, inventory full
+                    p = getPos();
+                    player_party->members[p.x]->items.remove(move_item);
+                    setParent(old_parent);
+                    p = getPos();
+                    player_party->members[p.x]->items.add(move_item);
+                    updateIcons();
+                    move({offset.x + (offset.x < 0 ? -1 : 1), offset.y});
+                }
+            }
             updateDesc();
             reparent_fix = true;
         }
+    }
+
+    sp::P<sp::gui::Widget> updateIcons() {
+        sp::P<sp::gui::Widget> move_item_icon;
+        for(auto n=0U; n<player_party->members.size(); n++)
+        {
+            auto member = player_party->members[n];
+            auto row = menu->getWidgetWithID("CHAR" + sp::string(n));
+            if (!member) {
+                row->hide();
+            } else {
+                auto it = member->items.begin();
+                for(int idx=0; idx<6; idx++) {
+                    sp::P<sp::gui::Image> icon = row->getWidgetWithID("ITEM" + sp::string(idx));
+                    icon->setAttribute("texture", "tiles.png");
+
+                    if (is_items) {
+                        while(it != member->items.end() && (*it)->type != Item::Type::Item)
+                            ++it;
+                    } else {
+                        while(it != member->items.end() && (*it)->type == Item::Type::Item)
+                            ++it;
+                    }
+                    if (it == member->items.end()) {
+                        icon->setUV(tileUV(0));
+                    } else {
+                        icon->setUV(tileUV((*it)->icon));
+                        if (*it == move_item)
+                            move_item_icon = icon;
+                        ++it;
+                    }
+                }
+            }
+        }
+        return move_item_icon;
     }
 
     sp::P<Item> getItem() {
@@ -602,6 +667,10 @@ public:
 
         float a = 37.5f;
         float b = 12.5f;
+        if (move_item) {
+            b -= 2.5f;
+            a -= 7.5f;
+        }
         
         vertices.emplace_back(sp::Vector3f(-a, -a, 0.0f), sp::Vector2f(uv0.x, uv0.y));
         vertices.emplace_back(sp::Vector3f(-b, -a, 0.0f), sp::Vector2f(uv1.x, uv0.y));
@@ -631,6 +700,7 @@ public:
 
     bool is_items;
     bool reparent_fix = false;
+    sp::P<Item> move_item;
 };
 
 void Scene::openItemsOrAbilitiesMenu(bool is_items)

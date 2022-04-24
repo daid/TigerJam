@@ -213,6 +213,9 @@ void BattleScene::onFixedUpdate()
         auto result = current_action->resume().value();
         if (!result) {
             current_entity->character->tickBuffs();
+            for(auto item : current_entity->character->items)
+                if (item->destroy_me)
+                    item.destroy();
 
             current_action = nullptr;
             for(auto be : battle_entities) {

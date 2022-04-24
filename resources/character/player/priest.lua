@@ -9,3 +9,4 @@ this.stamina = 8
 
 this.addItem("items/dagger.lua")
 this.addItem("items/spell/cure.lua")
+this.addItem("items/ether.lua")

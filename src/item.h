@@ -15,6 +15,7 @@ public:
     void setType(sp::string);
     sp::string getTarget() const;
     void setTarget(sp::string);
+    void destroy();
 
     sp::string name;
     sp::string description;
@@ -31,4 +32,5 @@ public:
         Ally,
         Self,
     } target = Target::Any;
+    bool destroy_me = false;
 };

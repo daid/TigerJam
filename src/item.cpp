@@ -20,6 +20,12 @@ void Item::onRegisterScriptBindings(sp::script::BindingClass& script_binding_cla
     script_binding_class.bindProperty("icon", icon);
     script_binding_class.bindProperty("type", &Item::getType, &Item::setType);
     script_binding_class.bindProperty("target", &Item::getTarget, &Item::setTarget);
+    script_binding_class.bind("destroy", &Item::destroy);
+}
+
+void Item::destroy()
+{
+    destroy_me = true;
 }
 
 sp::string Item::getType() const
