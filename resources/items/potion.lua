@@ -11,6 +11,7 @@ function use(source, target)
     local heal_amount = 150
     target.textRain("+" .. heal_amount)
     target.hp = target.hp + heal_amount
+    target.iconEffect(532, 12)
     for n=0, 25 do yield() end
 
     doMove(source, source.getFrontPosition(), source.getPosition(), 10)

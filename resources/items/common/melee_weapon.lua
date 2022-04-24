@@ -25,5 +25,5 @@ function use(source, target)
 end
 
 function onhit(source, target, dmg)
-
+    target.iconEffect(563, 7)
 end

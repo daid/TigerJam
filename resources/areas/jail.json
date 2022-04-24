@@ -63,6 +63,50 @@
                  "width":16,
                  "x":112,
                  "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":29,
+                 "name":"celldoor2",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":208,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":30,
+                 "name":"celldoor3",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":112,
+                 "y":112
+                }, 
+                {
+                 "height":16,
+                 "id":31,
+                 "name":"chest",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":240,
+                 "y":128
+                }, 
+                {
+                 "height":16,
+                 "id":32,
+                 "name":"celldoor4",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":208,
+                 "y":112
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -71,7 +115,7 @@
          "y":0
         }],
  "nextlayerid":3,
- "nextobjectid":29,
+ "nextobjectid":33,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.5.0",

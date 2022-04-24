@@ -33,11 +33,13 @@ if not recruit_options then
         {"ROGUE", "character/player/rogue.lua"},
         {"PRIEST", "character/player/priest.lua"},
         {"MONK", "character/player/monk.lua"},
+        {"WIZARD", "character/player/wizard.lua"},
     }
     recruit_options2 = {
         {"SPIDER", "character/player/spider.lua"},
         {"CHICKEN", "character/player/chicken.lua"},
         {"SQUID", "character/player/octopus.lua"},
+        {"MERMAID", "character/player/mermaid.lua"},
     }
     
     -- Shuffle the options

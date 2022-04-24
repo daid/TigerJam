@@ -10,6 +10,7 @@ weapon_hit = 0
 include("items/common/melee_weapon.lua")
 
 function onhit(source, target, dmg)
+    target.iconEffect(566, 7)
     if target.addBuff("POISON", {defense=-2}, function()
         for n=0,5 do
             yield()

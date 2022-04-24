@@ -10,6 +10,7 @@ weapon_hit = -10
 include("items/common/melee_weapon.lua")
 
 function onhit(source, target, dmg)
+    target.iconEffect(617, 7)
     source.textRain("+" .. dmg)
     source.hp = source.hp + dmg
 end

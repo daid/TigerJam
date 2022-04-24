@@ -22,6 +22,7 @@ function use(source, target)
             if dmg < 0 then dmg = 0 end
             
             target.textRain(dmg)
+            target.iconEffect(563, 4)
             sfx("basic_hit.wav")
             target.hp = target.hp - dmg
             if dmg > 0 then

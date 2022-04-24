@@ -10,6 +10,7 @@ function use(source, target)
     
     target.textRain("+30MP")
     target.mp = target.mp + 30
+    target.iconEffect(616, 12)
     for n=0, 25 do yield() end
 
     doMove(source, source.getFrontPosition(), source.getPosition(), 10)

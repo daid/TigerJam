@@ -14,6 +14,7 @@ function use(source, target)
         target.textRain("+" .. heal_amount)
         target.hp = target.hp + heal_amount
         source.mp = source.mp - 3
+        target.iconEffect(532, 12)
     else
         source.textRain("NO MP")
     end

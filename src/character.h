@@ -88,6 +88,7 @@ public:
     sp::Vector2d getPos();
     sp::Vector2d getFrontPos();
     void createTextRain(sp::string text);
+    void createIconEffect(int tile_idx, int frames);
     int getHP() const { return hp; }
     void setHP(int value) { hp = std::clamp(value, 0, active_stats.max_hp); }
     int getMaxHP() const { return active_stats.max_hp; }

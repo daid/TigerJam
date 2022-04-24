@@ -2,6 +2,7 @@
 #include "battlescene.h"
 #include "party.h"
 #include <sp2/graphics/fontManager.h>
+#include <sp2/graphics/textureManager.h>
 
 class TextRain : public sp::Node
 {
@@ -34,6 +35,37 @@ public:
     sp::Vector2d velocity;
 };
 
+class IconEffect : public sp::Node
+{
+public:
+    IconEffect(sp::P<sp::Node> parent, int tile_idx, int frames)
+    : sp::Node(parent->getParent()), timeout(frames)
+    {
+        setTile(tile_idx);
+        render_data.shader = sp::Shader::get("internal:basic.shader");
+        render_data.type = sp::RenderData::Type::Normal;
+        render_data.texture = sp::texture_manager.get("tiles.png");
+
+        setPosition(parent->getPosition2D());
+    }
+
+    void setTile(int tile_idx) {
+        auto tile_sx = 49;
+        auto tile_sy = 22;
+        auto u = 1.0f / float(tile_sx);
+        auto v = 1.0f / float(tile_sy);
+        render_data.mesh = sp::MeshData::createQuad({1.3, 1.3},
+            {(tile_idx % tile_sx) * u, (tile_idx / tile_sx) * v},
+            {(tile_idx % tile_sx) * u + u, (tile_idx / tile_sx) * v + v});
+    }
+
+    virtual void onFixedUpdate() override {
+        if (timeout-- <= 0)
+            delete this;
+    }
+
+    int timeout;
+};
 
 Character::Character(const sp::string& script_name)
 {
@@ -84,6 +116,7 @@ void Character::onRegisterScriptBindings(sp::script::BindingClass& script_bindin
     script_binding_class.bind("getPosition", &Character::getPos);
     script_binding_class.bind("getFrontPosition", &Character::getFrontPos);
     script_binding_class.bind("textRain", &Character::createTextRain);
+    script_binding_class.bind("iconEffect", &Character::createIconEffect);
     script_binding_class.bind("addItem", &Character::addItem);
     script_binding_class.bind("newMember", &Character::newMember);
     script_binding_class.bind("addBuff", &Character::addBuff);
@@ -124,6 +157,11 @@ sp::Vector2d Character::getFrontPos()
 void Character::createTextRain(sp::string text)
 {
     new TextRain(battle_entity, text);
+}
+
+void Character::createIconEffect(int tile_idx, int frames)
+{
+    new IconEffect(battle_entity, tile_idx, frames);
 }
 
 float Character::speed()

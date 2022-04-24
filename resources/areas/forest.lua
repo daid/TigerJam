@@ -2,9 +2,19 @@ onmove("entrance", "entrance")
 function entrance()
     loadmap("areas/map00", "forest")
 end
+
 onmove("chest", "chest")
 function chest()
-    message("Sorry, chests not implemented...")
+    if not forest_chest_opened then
+        message("Found: 2x [Potion]")
+        additem("items/potion.lua")
+        additem("items/potion.lua")
+        settile("chest", 303)
+        forest_chest_opened = true
+    end
+end
+if forest_chest_opened then
+    settile("chest", 303)
 end
 
 encounters = {

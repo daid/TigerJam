@@ -372,6 +372,26 @@ void luaSetTile(sp::string target, int tile)
     tilemap->setTile(map_spots[target], tile);
 }
 
+void luaAddItem(sp::string script_name)
+{
+    auto item = new Item(script_name);
+    bool is_item = item->type == Item::Type::Item;
+    for(auto& member : player_party->members) {
+        if (member) {
+            int count = 0;
+            for(auto i : member->items) {
+                if ((i->type == Item::Type::Item) == is_item)
+                    count += 1;
+            }
+            if (count < 6) {
+                member->items.add(item);
+                return;
+            }
+        }
+    }
+    delete item;
+}
+
 void luaRecoverHPMP()
 {
     for(auto member : player_party->members) {
@@ -437,6 +457,7 @@ Scene::Scene()
     script_env.setGlobal("newnpc", luaNewNPC);
     script_env.setGlobal("onmove", luaOnMove);
     script_env.setGlobal("settile", luaSetTile);
+    script_env.setGlobal("additem", luaAddItem);
     script_env.setGlobal("battle", luaBattle);
     script_env.setGlobal("recoverHPMP", luaRecoverHPMP);
     script_env.setGlobal("partyMemberCount", luaMemberCount);

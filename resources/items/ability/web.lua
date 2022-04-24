@@ -14,6 +14,7 @@ function use(source, target)
         target.textRain("miss")
     else
         if target.addBuff("WEB", {agility=-15}, function() for n=0,15 do yield() end target.textRain("+AGI") end) then
+            target.iconEffect(576, 12)
             target.textRain("-AGI")
         else
             source.textRain("No effect")
