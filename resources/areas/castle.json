@@ -96,6 +96,72 @@
                  "width":16,
                  "x":64,
                  "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":18,
+                 "name":"king2",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":64,
+                 "y":208
+                }, 
+                {
+                 "height":16,
+                 "id":19,
+                 "name":"queen2",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":64,
+                 "y":240
+                }, 
+                {
+                 "height":16,
+                 "id":20,
+                 "name":"guard3",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":224,
+                 "y":240
+                }, 
+                {
+                 "height":16,
+                 "id":21,
+                 "name":"books1",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":32,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":22,
+                 "name":"books2",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":48,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":23,
+                 "name":"books3",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":64,
+                 "y":48
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -104,7 +170,7 @@
          "y":0
         }],
  "nextlayerid":3,
- "nextobjectid":18,
+ "nextobjectid":24,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.5.0",

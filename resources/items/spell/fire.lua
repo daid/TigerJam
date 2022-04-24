@@ -11,6 +11,7 @@ function use(source, target)
     
     if source.mp >= 5 then
         local damage_amount = source.intelligence * 5 - target.stamina
+        if damage_amount < 0 then damage_amount = 0 end
         target.textRain(damage_amount)
         target.hp = target.hp - damage_amount
         source.mp = source.mp - 5

@@ -224,6 +224,8 @@ public:
     }
 };
 
+void luaNullFunc() {}
+
 void luaLoadmap(sp::string mapname, sp::string startpoint)
 {
     for(auto e : sp::Scene::get("MAIN")->getRoot()->getChildren()) {
@@ -288,6 +290,8 @@ void luaLoadmap(sp::string mapname, sp::string startpoint)
         }
     }
 
+    sp::P<Scene> scene = sp::Scene::get("MAIN");
+    scene->script_env.setGlobal("randomencounter", luaNullFunc);
     script_queue.push(mapname + ".lua");
 }
 
