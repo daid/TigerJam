@@ -14,7 +14,7 @@ function door()
     if found_wedding_ring and not killed_golem then
         message("You hear a loud rumble...")
         message("'Who too my ring!'")
-        --battle("monster/golem", "monster/ghost", "monster/ghost")
+        battle("monster/golem", "monster/ghost", "monster/ghost")
         yield()
         killed_golem = true
     end
@@ -41,5 +41,5 @@ encounters = {
 }
 
 function randomencounter()
-    --battle(table.unpack(encounters[irandom(1, #encounters)]))
+    battle(table.unpack(encounters[irandom(1, #encounters)]))
 end

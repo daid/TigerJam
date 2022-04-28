@@ -139,16 +139,19 @@ void Character::onRegisterScriptBindings(sp::script::BindingClass& script_bindin
 
 void Character::setPos(sp::Vector2d position)
 {
+    if (!battle_entity) return;
     battle_entity->setPosition(position);
 }
 
 sp::Vector2d Character::getPos()
 {
+    if (!battle_entity) return {0, 0};
     return battle_entity->neutral_position;
 }
 
 sp::Vector2d Character::getFrontPos()
 {
+    if (!battle_entity) return {0, 0};
     if (battle_entity->neutral_position.x > 0)
         return battle_entity->neutral_position - sp::Vector2d{1.5, 0.0};
     return battle_entity->neutral_position + sp::Vector2d{1.5, 0.0};
@@ -156,11 +159,13 @@ sp::Vector2d Character::getFrontPos()
 
 void Character::createTextRain(sp::string text)
 {
+    if (!battle_entity) return;
     new TextRain(battle_entity, text);
 }
 
 void Character::createIconEffect(int tile_idx, int frames)
 {
+    if (!battle_entity) return;
     new IconEffect(battle_entity, tile_idx, frames);
 }
 
@@ -177,6 +182,7 @@ void Character::addItem(sp::string item)
 bool Character::newMember(sp::string script_name)
 {
     sp::P<BattleScene> bs = sp::Scene::get("BATTLE");
+    if (!bs) return;
     return bs->newMember(battle_entity->party, script_name);
 }
 
