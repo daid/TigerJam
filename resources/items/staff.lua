@@ -1,4 +1,4 @@
-this.name = "Quaterstaff"
+this.name = "Quarterstaff"
 this.description = "Simple wooden staff, +8 attack"
 this.icon = 279
 this.target = "enemy"

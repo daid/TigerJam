@@ -480,7 +480,6 @@ Scene::Scene()
 
     map_player = new MapPlayer(getRoot(), {8, 8});
 
-    script_env.setGlobal("randomencounter", nullptr);
     active_sequence = script_env.loadCoroutine("start.lua").value();
 }
 
@@ -560,7 +559,7 @@ void Scene::onUpdate(float delta)
             steps_till_battle -= 1;
             if (steps_till_battle <= 0 && script_function_queue.empty() && script_queue.empty()) {
                 active_sequence = script_env.callCoroutine("randomencounter").value();
-                steps_till_battle = sp::irandom(5, 10);
+                steps_till_battle = sp::irandom(7, 15);
             }
         }
         break;

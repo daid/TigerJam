@@ -3,6 +3,12 @@ function entrance()
     loadmap("areas/castle", "jail")
 end
 
+for n=1,2 do onmove("bed" .. n, "bed") end
+function bed()
+    message("Took a rest\nHP/MP recovered")
+    recoverHPMP();
+end
+
 if jail_wall_destroyed then
     settile("weak_wall", 846)
 else
@@ -37,7 +43,9 @@ encounters = {
     {"monster/rat", "monster/bat", "monster/rat"},
 }
 function randomencounter()
-    battle(table.unpack(encounters[irandom(1, #encounters)]))
+    if jail_wall_destroyed then
+        battle(table.unpack(encounters[irandom(1, #encounters)]))
+    end
 end
 
 onmove("chest", "chest")

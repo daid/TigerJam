@@ -1,6 +1,11 @@
 onmove("entrance", "entrance")
 function entrance()
-    loadmap("areas/town1", "castle")
+    if jail_wall_destroyed and not got_river_hint then
+        message("We should search the castle for a hint where to go next")
+        moveplayer(0, 1)
+    else
+        loadmap("areas/town1", "castle")
+    end
 end
 
 onmove("jail", "enterjail")
@@ -27,19 +32,20 @@ if not jail_wall_destroyed then
             
             guard1.move(0, -1)
             guard2.move(0, -1)
-            for n=0,10 do yield() end
+            for n=0,20 do yield() end
             guard1.move(1, 0)
             guard2.move(-1, 0)
-            for n=0,10 do yield() end
+            for n=0,20 do yield() end
             guard1.move(0, -1)
             guard2.move(0, -1)
-            for n=0,10 do yield() end
+            for n=0,20 do yield() end
             guard1.move(1, 0)
             guard2.move(-1, 0)
-            for n=0,10 do yield() end
+            for n=0,20 do yield() end
             message("Off to jail with you!")
             loadmap("areas/jail", "cell")
             message("Until, never.\nAnd don't you try to escape!")
+            recoverHPMP();
         end
     end)
 

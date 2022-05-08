@@ -57,29 +57,39 @@ if not recruit_options then
     recruit_options2 = nil
 end
 
+function addSelectedMember(choice)
+    for idx, data in ipairs(recruit_options) do
+        if data[1] == choice then
+            partyMemberAdd(data[2])
+            message("Added "..data[1].." to your party")
+            table.remove(recruit_options, idx)
+            table.insert(recruit_options, data)
+            return
+        end
+    end
+end
+
 guildmaster = newnpc("guildmaster", 224)
 onmove("guildmastertable", "guildmastertable")
 function guildmastertable()
-    local choice = menu("Welcome", "Recruit", "Dismiss", "Leave")
+    local choice = menu("Welcome", "Recruit", "Dismiss", "Rest", "Leave")
     if choice == "Recruit" then
         if partyMemberCount() > 3 then
             message("Sorry, your party is already full")
         else
-            local options = {}
-            for idx, data in ipairs(recruit_options) do
-                if #options < 4 then
-                    table.insert(options, data[1])
+            while partyMemberCount() < 4 do
+                local options = {}
+                for idx, data in ipairs(recruit_options) do
+                    if #options < 4 then
+                        table.insert(options, data[1])
+                    end
                 end
-            end
-            table.insert(options, "Cancel")
-            choice = menu("Which member would you want?", table.unpack(options))
-            for idx, data in ipairs(recruit_options) do
-                if data[1] == choice then
-                    partyMemberAdd(data[2])
-                    table.remove(recruit_options, idx)
-                    table.insert(recruit_options, data)
+                table.insert(options, "Cancel")
+                choice = menu("Which member would you want? ("..partyMemberCount().."/4)", table.unpack(options))
+                if choice == "Cancel" then
                     return
                 end
+                addSelectedMember(choice)
             end
         end
     elseif choice == "Dismiss" then
@@ -95,5 +105,7 @@ function guildmastertable()
                 end
             end
         end
+    elseif choice == "Rest" then
+        message("Just use any of the beds to rest up.")
     end
 end

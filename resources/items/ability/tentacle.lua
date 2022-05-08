@@ -4,7 +4,7 @@ this.icon = 417
 this.target = "enemy"
 this.type = "ability"
 
-weapon_strength = -10
+weapon_strength = -5
 weapon_hit = -10
 
 include("items/common/melee_weapon.lua")

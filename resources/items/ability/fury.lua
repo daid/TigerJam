@@ -4,7 +4,7 @@ this.icon = 575
 this.target = "enemy"
 this.type = "ability"
 
-weapon_strength = -2
+weapon_strength = 3
 weapon_hit = -5
 
 include("items/common/util.lua")

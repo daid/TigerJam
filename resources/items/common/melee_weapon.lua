@@ -8,6 +8,7 @@ function use(source, target)
         target.textRain("miss")
     else
         local dmg = source.strength + weapon_strength
+        if dmg < 0 then dmg = 0 end
         dmg = irandom(dmg, dmg * 2) - target.defence
         if dmg < 0 then dmg = 0 end
         
