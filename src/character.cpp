@@ -182,7 +182,7 @@ void Character::addItem(sp::string item)
 bool Character::newMember(sp::string script_name)
 {
     sp::P<BattleScene> bs = sp::Scene::get("BATTLE");
-    if (!bs) return;
+    if (!bs) return false;
     return bs->newMember(battle_entity->party, script_name);
 }
 
