@@ -3,6 +3,7 @@
 
 #include <sp2/engine.h>
 #include <sp2/graphics/gui/loader.h>
+#include <sp2/audio/music.h>
 
 
 IngameMenuScene::IngameMenuScene()
@@ -45,6 +46,7 @@ void IngameMenuScene::onUpdate(float delta)
             node.destroy();
         sp::Engine::getInstance()->setGameSpeed(1.0);
         sp::Scene::get("MAIN").destroy();
+        sp::audio::Music::stop();
         openMainMenu();
         exit = false;
     }
