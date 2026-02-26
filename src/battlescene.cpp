@@ -142,7 +142,7 @@ BattleScene::BattleScene()
     camera->setPosition({0, -1});
     setDefaultCamera(camera);
 
-    onEnable();
+    onEnable(sp::Scene::FlagEnableUpdate | sp::Scene::FlagEnableRender | sp::Scene::FlagEnableInput);
 }
 
 BattleScene::~BattleScene()
@@ -150,7 +150,7 @@ BattleScene::~BattleScene()
     gui.destroy();
 }
 
-void BattleScene::onEnable()
+void BattleScene::onEnable(uint32_t flags)
 {
     createBattleEntities(player_party, -1);
     createBattleEntities(enemy_party, 1);
@@ -160,7 +160,7 @@ void BattleScene::onEnable()
     sp::audio::Music::play("music/tough-consequence.ogg", true);
 }
 
-void BattleScene::onDisable()
+void BattleScene::onDisable(uint32_t flags)
 {
     sp::audio::Music::stop();
     for(auto e : battle_entities)
